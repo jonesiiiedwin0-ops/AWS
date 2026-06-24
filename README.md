@@ -56,7 +56,7 @@ The MVP targets the services people most often ask an AI about:
 | S3      | `s3_list_buckets`, `s3_list_objects`, `s3_bucket_summary` | ✅ Working |
 | EC2     | `ec2_describe_instances`, `ec2_instance_state_counts` | ✅ Working |
 | Lambda  | `lambda_list_functions`, `lambda_runtime_counts` | ✅ Working |
-| CloudWatch | Read metrics & logs       | 📋 Planned |
+| CloudWatch | `cloudwatch_list_alarms`, `cloudwatch_alarm_state_counts` | ✅ Working |
 | Cost Explorer | Cost & usage summaries | 📋 Planned |
 
 List the tools your current config exposes at any time with
@@ -139,8 +139,8 @@ chain. **Never commit credentials** — `.env` is git-ignored.
 The full, phased plan lives in **[STRATEGY.md](STRATEGY.md)**. In brief:
 
 - **Phase 0 — Foundation** *(done)*: installable skeleton, CI, tests, docs.
-- **Phase 1 — MVP** *(current)*: read-only services + sub-5-minute setup. S3 and
-  EC2 tools are live; Lambda, CloudWatch, and Cost Explorer are next.
+- **Phase 1 — MVP** *(current)*: read-only services + sub-5-minute setup. S3,
+  EC2, Lambda, and CloudWatch tools are live; Cost Explorer is next.
 - **Phase 2 — Trust**: safety rails, audit logging, IAM policy generator.
 - **Phase 3 — Reach**: docs site, registry listings, client configs.
 - **Phase 4+ — Depth & platform**: more services, plugin API, 1.0.

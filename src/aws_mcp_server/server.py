@@ -20,7 +20,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from .config import Config
-from .services import ec2, lambda_, s3
+from .services import cloudwatch, ec2, lambda_, s3
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from mcp.server.fastmcp import FastMCP
@@ -30,7 +30,7 @@ logger = logging.getLogger("aws_mcp_server")
 # Services that have read-only handlers wired up today. Anything enabled in
 # config but not present here is reported as unsupported rather than silently
 # ignored.
-SUPPORTED_SERVICES = frozenset({"s3", "ec2", "lambda"})
+SUPPORTED_SERVICES = frozenset({"s3", "ec2", "lambda", "cloudwatch"})
 
 
 def configure_logging(level: str) -> None:
@@ -66,6 +66,8 @@ def build_server(config: Config) -> FastMCP:
         _register_ec2(mcp, session)
     if "lambda" in requested:
         _register_lambda(mcp, session)
+    if "cloudwatch" in requested:
+        _register_cloudwatch(mcp, session)
 
     logger.info(
         "Configured AWS MCP Server | region=%s read_only=%s services=%s",
@@ -123,3 +125,22 @@ def _register_lambda(mcp: FastMCP, session: Any) -> None:
     def lambda_runtime_counts(region: str = "") -> dict:
         """Count Lambda functions grouped by runtime (read-only)."""
         return lambda_.runtime_counts(session, region=region or None)
+
+
+def _register_cloudwatch(mcp: FastMCP, session: Any) -> None:
+    @mcp.tool()
+    def cloudwatch_list_alarms(
+        region: str = "", state: str = "", max_alarms: int = 100
+    ) -> dict:
+        """List CloudWatch metric alarms, optionally filtered by state (read-only)."""
+        return cloudwatch.list_alarms(
+            session,
+            region=region or None,
+            state=state or None,
+            max_alarms=max_alarms,
+        )
+
+    @mcp.tool()
+    def cloudwatch_alarm_state_counts(region: str = "") -> dict:
+        """Count CloudWatch alarms grouped by state: OK/ALARM/INSUFFICIENT_DATA (read-only)."""
+        return cloudwatch.alarm_state_counts(session, region=region or None)

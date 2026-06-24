@@ -8,4 +8,4 @@ required — and keeps the MCP wiring in :mod:`aws_mcp_server.server` thin.
 
 from __future__ import annotations
 
-__all__ = ["s3", "ec2"]
+__all__ = ["s3", "ec2", "lambda_"]

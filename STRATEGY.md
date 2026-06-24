@@ -76,7 +76,7 @@ copy the pattern, not the marketing.
 | Phase | Goal | Definition of done | Star horizon* |
 |------:|------|--------------------|--------------:|
 | **0. Foundation** ✅ | Real, installable skeleton + clean repo | Working server stub, CI, tests, contributor docs | 0–100 |
-| **1. MVP** 🚧 | 5 services, read-only, <5-min setup | Real MCP server with live S3 + EC2 read-only tools (moto-tested); Lambda/CloudWatch/Cost Explorer next; demo video | 100–1k |
+| **1. MVP** 🚧 | 5 services, read-only, <5-min setup | Real MCP server with live S3 + EC2 + Lambda read-only tools (moto-tested); CloudWatch/Cost Explorer next; demo video | 100–1k |
 | **2. Trust** | Safety rails + audit + IAM generator | Threat model published; mutating ops gated; security policy | 1k–5k |
 | **3. Reach** | Docs site + registry listings + client configs | Listed in MCP registries; docs site live; 20+ recipes | 5k–25k |
 | **4. Depth** | 25+ services, plugins, performance | Plugin API; benchmarks published; enterprise auth (SSO/roles) | 25k–60k |

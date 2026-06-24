@@ -20,7 +20,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from .config import Config
-from .services import ec2, s3
+from .services import ec2, lambda_, s3
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from mcp.server.fastmcp import FastMCP
@@ -30,7 +30,7 @@ logger = logging.getLogger("aws_mcp_server")
 # Services that have read-only handlers wired up today. Anything enabled in
 # config but not present here is reported as unsupported rather than silently
 # ignored.
-SUPPORTED_SERVICES = frozenset({"s3", "ec2"})
+SUPPORTED_SERVICES = frozenset({"s3", "ec2", "lambda"})
 
 
 def configure_logging(level: str) -> None:
@@ -64,6 +64,8 @@ def build_server(config: Config) -> FastMCP:
         _register_s3(mcp, session)
     if "ec2" in requested:
         _register_ec2(mcp, session)
+    if "lambda" in requested:
+        _register_lambda(mcp, session)
 
     logger.info(
         "Configured AWS MCP Server | region=%s read_only=%s services=%s",
@@ -107,3 +109,17 @@ def _register_ec2(mcp: FastMCP, session: Any) -> None:
     def ec2_instance_state_counts(region: str = "") -> dict:
         """Count EC2 instances grouped by lifecycle state (read-only)."""
         return ec2.instance_state_counts(session, region=region or None)
+
+
+def _register_lambda(mcp: FastMCP, session: Any) -> None:
+    @mcp.tool()
+    def lambda_list_functions(region: str = "", max_functions: int = 100) -> dict:
+        """List Lambda functions, one record per function (read-only)."""
+        return lambda_.list_functions(
+            session, region=region or None, max_functions=max_functions
+        )
+
+    @mcp.tool()
+    def lambda_runtime_counts(region: str = "") -> dict:
+        """Count Lambda functions grouped by runtime (read-only)."""
+        return lambda_.runtime_counts(session, region=region or None)

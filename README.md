@@ -55,7 +55,7 @@ The MVP targets the services people most often ask an AI about:
 |---------|-------------------|--------|
 | S3      | `s3_list_buckets`, `s3_list_objects`, `s3_bucket_summary` | ✅ Working |
 | EC2     | `ec2_describe_instances`, `ec2_instance_state_counts` | ✅ Working |
-| Lambda  | List/describe functions      | 📋 Planned |
+| Lambda  | `lambda_list_functions`, `lambda_runtime_counts` | ✅ Working |
 | CloudWatch | Read metrics & logs       | 📋 Planned |
 | Cost Explorer | Cost & usage summaries | 📋 Planned |
 

@@ -35,6 +35,7 @@ moto>=4.2.0
 
 # Security
 cryptography>=41.0.0
+cffi>=1.15.0
 
 # Utilities
 tenacity>=8.2.0

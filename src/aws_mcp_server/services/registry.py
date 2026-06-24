@@ -10,6 +10,8 @@ from ..config import Config
 from ..metrics import MetricsCollector, default_collector
 from ..rate_limiter import RateLimiter
 from .base import BaseService, ServiceError
+from .cloudwatch import CloudWatchService
+from .cost_explorer import CostExplorerService
 from .dynamodb import DynamoDBService
 from .ec2 import EC2Service
 from .iam import IAMService
@@ -24,12 +26,14 @@ _CACHEABLE_PREFIXES = ("list_", "describe_", "get_")
 
 # All known service classes keyed by their service name.
 _SERVICE_CLASSES = {
-    "ec2": EC2Service,
-    "s3": S3Service,
-    "lambda": LambdaService,
+    "ce": CostExplorerService,
+    "cloudwatch": CloudWatchService,
     "dynamodb": DynamoDBService,
-    "rds": RDSService,
+    "ec2": EC2Service,
     "iam": IAMService,
+    "lambda": LambdaService,
+    "rds": RDSService,
+    "s3": S3Service,
 }
 
 

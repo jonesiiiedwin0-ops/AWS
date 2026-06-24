@@ -131,27 +131,16 @@ jobs:
     name: Security Summary
     needs: [bandit, safety, credential-scan, permission-audit, build-artifacts]
     if: always()
+    continue-on-error: true
 
     steps:
-    - name: Download Bandit report
-      uses: actions/download-artifact@v3
-      with:
-        name: bandit-report
-      continue-on-error: true
-
-    - name: Download Safety report
-      uses: actions/download-artifact@v3
-      with:
-        name: safety-report
-      continue-on-error: true
-
     - name: Generate security summary
       run: |
         echo "## Security Scan Summary"
-        echo "- Bandit: Completed"
-        echo "- Safety: Completed"
-        echo "- Credential Scan: Completed"
-        echo "- Permission Audit: Completed"
-        echo "- Build Verification: Completed"
+        echo "- Bandit: Security analysis"
+        echo "- Safety: Dependency check"
+        echo "- Credential Scan: Secret detection"
+        echo "- Permission Audit: IAM validation"
+        echo "- Build Verification: Build check"
         echo ""
-        echo "✓ All security checks passed"
+        echo "✓ Security workflow completed"

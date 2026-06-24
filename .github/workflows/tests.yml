@@ -21,16 +21,62 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Lint with ruff
-      run: ruff check src/ tests/ || true
+      run: |
+        ruff check src/ tests/
+
+    - name: Format check with black
+      run: |
+        black --check src/ tests/
 
     - name: Type check with mypy
-      run: mypy src/ || true
+      run: |
+        mypy src/
 
     - name: Run tests with pytest
-      run: pytest --cov=src --cov-report=xml || true
+      run: |
+        pytest --cov=src --cov-report=xml --cov-report=term-missing
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+
+    - name: Run security checks with bandit
+      run: |
+        bandit -r src/ -f json -o bandit-report.json || true
+
+    - name: Check dependencies with safety
+      run: |
+        safety check --json || true

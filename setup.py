@@ -11,7 +11,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="aws-mcp-server",
-    version="0.1.0",
+    version="0.2.0",
     author="jonesiiiedwin0-ops",
     description="A powerful MCP server for AWS services integration",
     long_description=long_description,
@@ -22,11 +22,14 @@ setup(
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
+        "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Operating System :: OS Independent",
     ],
     python_requires=">=3.9",
     install_requires=requirements,
@@ -35,5 +38,6 @@ setup(
             "aws-mcp-server=aws_mcp_server.__main__:main",
         ],
     },
+    include_package_data=True,
     zip_safe=False,
 )

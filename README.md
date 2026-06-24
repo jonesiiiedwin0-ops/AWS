@@ -19,11 +19,12 @@
 
 ---
 
-> **Project status: early foundation.** This repository currently ships a
-> minimal, installable server skeleton plus the project scaffolding (CI, tests,
-> docs, contributor guides). The service implementations are being built out in
-> the open — see the [Roadmap](#-roadmap) and [STRATEGY.md](STRATEGY.md). We
-> document what exists today, not what we wish existed.
+> **Project status: MVP in progress.** This repository ships a real MCP server
+> over the official `mcp` SDK with **working read-only tools for Amazon S3 and
+> EC2**, backed by a `moto` test suite that runs without an AWS account. More
+> services are being built out in the open — see the [Roadmap](#-roadmap) and
+> [STRATEGY.md](STRATEGY.md). We document what exists today, not what we wish
+> existed.
 
 ## 🌟 Overview
 
@@ -46,19 +47,21 @@ MCP-compatible client, no custom glue required.
 - 🧪 **Tested** — CI runs lint, type-check, and tests on every change (against
   mocked AWS, so no account is needed to contribute).
 
-## 🛠️ Planned service coverage
+## 🛠️ Service coverage
 
 The MVP targets the services people most often ask an AI about:
 
-| Service | Capability (MVP) | Status |
-|---------|------------------|--------|
-| S3      | List buckets/objects, sizes | 🚧 In progress |
-| EC2     | Describe instances, state    | 🚧 In progress |
+| Service | Tools (read-only) | Status |
+|---------|-------------------|--------|
+| S3      | `s3_list_buckets`, `s3_list_objects`, `s3_bucket_summary` | ✅ Working |
+| EC2     | `ec2_describe_instances`, `ec2_instance_state_counts` | ✅ Working |
 | Lambda  | List/describe functions      | 📋 Planned |
 | CloudWatch | Read metrics & logs       | 📋 Planned |
 | Cost Explorer | Cost & usage summaries | 📋 Planned |
 
-Additional services are tracked on the [Roadmap](#-roadmap).
+List the tools your current config exposes at any time with
+`aws-mcp-server --list-tools`. Additional services are tracked on the
+[Roadmap](#-roadmap).
 
 ## 📋 Prerequisites
 
@@ -85,7 +88,8 @@ pip install -e ".[dev]"
 
 # Verify the install
 aws-mcp-server --version
-aws-mcp-server --help
+aws-mcp-server --check        # validate config without starting
+aws-mcp-server --list-tools   # show the read-only tools that will be exposed
 ```
 
 Run the server:
@@ -134,8 +138,9 @@ chain. **Never commit credentials** — `.env` is git-ignored.
 
 The full, phased plan lives in **[STRATEGY.md](STRATEGY.md)**. In brief:
 
-- **Phase 0 — Foundation** *(current)*: installable skeleton, CI, tests, docs.
-- **Phase 1 — MVP**: five read-only services, sub-5-minute setup.
+- **Phase 0 — Foundation** *(done)*: installable skeleton, CI, tests, docs.
+- **Phase 1 — MVP** *(current)*: read-only services + sub-5-minute setup. S3 and
+  EC2 tools are live; Lambda, CloudWatch, and Cost Explorer are next.
 - **Phase 2 — Trust**: safety rails, audit logging, IAM policy generator.
 - **Phase 3 — Reach**: docs site, registry listings, client configs.
 - **Phase 4+ — Depth & platform**: more services, plugin API, 1.0.

@@ -21,7 +21,10 @@ def test_check_mode_returns_zero(monkeypatch, capsys):
     assert "Configuration OK" in capsys.readouterr().out
 
 
-def test_run_without_transport_returns_two(capsys):
-    rc = main([])
-    assert rc == 2
-    assert "not implemented yet" in capsys.readouterr().err
+def test_list_tools_lists_registered_tools(monkeypatch, capsys):
+    monkeypatch.setenv("AWS_MCP_ENABLED_SERVICES", "s3,ec2")
+    rc = main(["--list-tools"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "s3_list_buckets" in out
+    assert "ec2_describe_instances" in out

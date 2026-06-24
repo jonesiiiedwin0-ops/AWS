@@ -8,10 +8,13 @@
 
 ## 0. The honest starting point
 
-As of today this repository has a README and a license but **no working code**.
-The single highest-leverage move is to ship something real that solves a
-genuine problem better than the alternatives. Everything below assumes we earn
-attention with substance first.
+This repository now ships a **real MCP server** with working, read-only tools
+for Amazon S3 and EC2 — built on the official `mcp` SDK and covered by a
+`moto`-backed test suite that needs no AWS account. That is the first install of
+the "ship something real" principle below: a narrow, genuinely useful slice that
+beats vaporware. Everything else assumes we keep earning attention with
+substance — more services, sharper safety rails, and shorter time-to-value —
+rather than marketing.
 
 Repos that have crossed 100k stars (e.g. `freeCodeCamp`, `vscode`,
 `tensorflow`, `kubernetes`, `ollama`) share a pattern: **a sharp problem, a
@@ -72,8 +75,8 @@ copy the pattern, not the marketing.
 
 | Phase | Goal | Definition of done | Star horizon* |
 |------:|------|--------------------|--------------:|
-| **0. Foundation** | Real, installable skeleton + clean repo | This commit: working server stub, CI, tests, contributor docs | 0–100 |
-| **1. MVP** | 5 services, read-only, <5-min setup | `uvx aws-mcp-server` works against a live account; demo video | 100–1k |
+| **0. Foundation** ✅ | Real, installable skeleton + clean repo | Working server stub, CI, tests, contributor docs | 0–100 |
+| **1. MVP** 🚧 | 5 services, read-only, <5-min setup | Real MCP server with live S3 + EC2 read-only tools (moto-tested); Lambda/CloudWatch/Cost Explorer next; demo video | 100–1k |
 | **2. Trust** | Safety rails + audit + IAM generator | Threat model published; mutating ops gated; security policy | 1k–5k |
 | **3. Reach** | Docs site + registry listings + client configs | Listed in MCP registries; docs site live; 20+ recipes | 5k–25k |
 | **4. Depth** | 25+ services, plugins, performance | Plugin API; benchmarks published; enterprise auth (SSO/roles) | 25k–60k |

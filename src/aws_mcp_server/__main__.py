@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-import sys
+import asyncio
 
 from . import __version__
 from .config import Config
@@ -21,6 +21,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Validate configuration and exit without starting the server.",
     )
+    parser.add_argument(
+        "--list-tools",
+        action="store_true",
+        help="Print the MCP tools that would be exposed, then exit.",
+    )
     return parser
 
 
@@ -29,7 +34,6 @@ def main(argv: list[str] | None = None) -> int:
 
     config = Config.from_env()
     configure_logging(config.log_level)
-    server = build_server(config)
 
     if args.check:
         print(
@@ -41,11 +45,18 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
-    try:
-        server.run()
-    except NotImplementedError as exc:
-        print(f"aws-mcp-server: {exc}", file=sys.stderr)
-        return 2
+    server = build_server(config)
+
+    if args.list_tools:
+        tools = asyncio.run(server.list_tools())
+        if not tools:
+            print("No tools registered (check AWS_MCP_ENABLED_SERVICES).")
+        for tool in sorted(tools, key=lambda t: t.name):
+            print(f"{tool.name}\t{tool.description or ''}")
+        return 0
+
+    # Start the MCP server over stdio. This blocks until the client disconnects.
+    server.run()
     return 0
 
 

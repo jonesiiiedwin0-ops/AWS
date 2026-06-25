@@ -9,7 +9,7 @@ from ..cache import TTLCache
 from ..config import Config
 from ..metrics import MetricsCollector, default_collector
 from ..rate_limiter import RateLimiter
-from .base import BaseService, ServiceError
+from .base import ServiceError
 from .dynamodb import DynamoDBService
 from .ec2 import EC2Service
 from .iam import IAMService

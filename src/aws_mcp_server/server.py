@@ -14,11 +14,13 @@ from .models import (
     ExecuteResponse,
     HealthResponse,
     ServicesResponse,
+    ToolDescriptor,
     ToolsResponse,
 )
 from .rate_limiter import RateLimitExceeded
 from .services import ServiceRegistry
 from .services.base import ServiceError
+from .services.playwright_service import PlaywrightError
 from .middleware import ErrorHandlerMiddleware, LoggingMiddleware
 
 logger = logging.getLogger(__name__)
@@ -96,6 +98,7 @@ class MCPServer:
                 status="healthy",
                 services=self.service_registry.list_available_services(),
                 version="0.2.0",
+                credentials_valid=None,
             )
 
         @app.get("/services", response_model=ServicesResponse, tags=["health"])
@@ -110,7 +113,10 @@ class MCPServer:
         async def list_tools() -> ToolsResponse:
             """List every available tool across enabled services."""
             tools = self.service_registry.get_available_tools()
-            return ToolsResponse(count=len(tools), tools=tools)
+            return ToolsResponse(
+                count=len(tools),
+                tools=[ToolDescriptor(**t) for t in tools],
+            )
 
         @app.post(
             "/execute",
@@ -132,7 +138,10 @@ class MCPServer:
                     client_id=self._client_id(request),
                 )
                 return ExecuteResponse(
-                    status="success", tool_name=body.tool_name, result=result
+                    status="success",
+                    tool_name=body.tool_name,
+                    result=result,
+                    error=None,
                 )
             except RateLimitExceeded as exc:
                 raise HTTPException(
@@ -140,7 +149,7 @@ class MCPServer:
                     detail=str(exc),
                     headers={"Retry-After": str(int(exc.retry_after) + 1)},
                 )
-            except ServiceError as exc:
+            except (ServiceError, PlaywrightError) as exc:
                 logger.warning("Tool %s failed: %s", body.tool_name, exc)
                 raise HTTPException(status_code=400, detail=str(exc))
 

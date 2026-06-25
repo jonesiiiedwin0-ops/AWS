@@ -68,10 +68,10 @@ class MetricsCollector:
                 for labelset, value in series.items():
                     lines.append(f"{name}{self._fmt_labels(labelset)} {value}")
 
-            for name, series in self._histograms.items():
-                lines.append(f"# TYPE {name} histogram")
-                for labelset, values in series.items():
-                    lines.extend(self._render_histogram(name, labelset, values))
+            for hname, hseries in self._histograms.items():
+                lines.append(f"# TYPE {hname} histogram")
+                for labelset, values in hseries.items():
+                    lines.extend(self._render_histogram(hname, labelset, values))
 
         return "\n".join(lines) + "\n"
 

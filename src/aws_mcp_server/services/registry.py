@@ -9,11 +9,12 @@ from ..cache import TTLCache
 from ..config import Config
 from ..metrics import MetricsCollector, default_collector
 from ..rate_limiter import RateLimiter
-from .base import BaseService, ServiceError
+from .base import ServiceError
 from .dynamodb import DynamoDBService
 from .ec2 import EC2Service
 from .iam import IAMService
 from .lambda_service import LambdaService
+from .playwright_service import PlaywrightError, PlaywrightService
 from .rds import RDSService
 from .s3 import S3Service
 
@@ -30,6 +31,11 @@ _SERVICE_CLASSES = {
     "dynamodb": DynamoDBService,
     "rds": RDSService,
     "iam": IAMService,
+}
+
+# Services that don't use AWS clients (lifecycle managed separately).
+_NON_AWS_SERVICES = {
+    "playwright": PlaywrightService,
 }
 
 
@@ -65,17 +71,22 @@ class ServiceRegistry:
             capacity=config.max_connections * 2,
         )
         self.metrics = metrics or default_collector
-        self.services: Dict[str, BaseService] = {}
+        self.services: Dict[str, Any] = {}
         self._initialize_services()
 
     def _initialize_services(self) -> None:
         """Instantiate enabled services."""
         for name in self.config.enabled_services:
+            if name in _NON_AWS_SERVICES:
+                self.services[name] = _NON_AWS_SERVICES[name]()
+                logger.info("Service %s initialized", name)
+                continue
+
             service_cls = _SERVICE_CLASSES.get(name)
             if service_cls is None:
                 logger.warning("Unknown service '%s' in enabled_services", name)
                 continue
-            self.services[name] = service_cls(self.client_manager)
+            self.services[name] = service_cls(self.client_manager)  # type: ignore[abstract]
             logger.info("Service %s initialized", name)
 
     def list_available_services(self) -> List[str]:
@@ -170,6 +181,9 @@ class ServiceRegistry:
             if cache_key is not None:
                 self.cache.set(cache_key, result)
             return result
+        except (PlaywrightError, ServiceError):
+            status = "error"
+            raise
         except Exception:
             status = "error"
             raise

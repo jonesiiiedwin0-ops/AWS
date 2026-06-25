@@ -49,8 +49,9 @@ class Config(BaseSettings):
             "dynamodb",
             "rds",
             "iam",
+            "playwright",
         ],
-        description="List of enabled AWS services",
+        description="List of enabled services (AWS + browser automation)",
     )
 
     # Performance Configuration

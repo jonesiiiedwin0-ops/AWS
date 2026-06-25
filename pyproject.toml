@@ -145,6 +145,7 @@ ignore_errors = true
 
 [tool.pytest.ini_options]
 minversion = "7.0"
+pythonpath = ["src"]
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"

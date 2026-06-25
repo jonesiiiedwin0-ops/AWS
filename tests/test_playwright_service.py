@@ -3,7 +3,10 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from aws_mcp_server.services.playwright_service import PlaywrightError, PlaywrightService
+from aws_mcp_server.services.playwright_service import (
+    PlaywrightError,
+    PlaywrightService,
+)
 
 
 @pytest.fixture
@@ -22,9 +25,16 @@ def test_service_metadata(service):
 def test_list_tools(service):
     tools = service.list_tools()
     expected = {
-        "navigate", "screenshot", "click", "fill",
-        "get_text", "get_html", "wait_for_selector",
-        "evaluate", "select_option", "hover",
+        "navigate",
+        "screenshot",
+        "click",
+        "fill",
+        "get_text",
+        "get_html",
+        "wait_for_selector",
+        "evaluate",
+        "select_option",
+        "hover",
     }
     assert expected.issubset(set(tools))
 
@@ -120,5 +130,7 @@ async def test_click_missing_params(service):
 
 @pytest.mark.asyncio
 async def test_fill_missing_params(service):
-    with pytest.raises(PlaywrightError, match="'url', 'selector', and 'value' are required"):
+    with pytest.raises(
+        PlaywrightError, match="'url', 'selector', and 'value' are required"
+    ):
         await service.execute("fill", {"url": "https://example.com", "selector": "#q"})

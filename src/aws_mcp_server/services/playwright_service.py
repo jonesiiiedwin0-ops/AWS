@@ -229,7 +229,12 @@ class PlaywrightService:
         try:
             await page.goto(url, timeout=timeout, wait_until="load")
             await page.wait_for_selector(selector, state=state, timeout=timeout)
-            return {"url": page.url, "selector": selector, "state": state, "found": True}
+            return {
+                "url": page.url,
+                "selector": selector,
+                "state": state,
+                "found": True,
+            }
         finally:
             await page.close()
 

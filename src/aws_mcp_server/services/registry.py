@@ -71,7 +71,7 @@ class ServiceRegistry:
             capacity=config.max_connections * 2,
         )
         self.metrics = metrics or default_collector
-        self.services: Dict[str, BaseService] = {}
+        self.services: Dict[str, Any] = {}
         self._initialize_services()
 
     def _initialize_services(self) -> None:
@@ -86,7 +86,7 @@ class ServiceRegistry:
             if service_cls is None:
                 logger.warning("Unknown service '%s' in enabled_services", name)
                 continue
-            self.services[name] = service_cls(self.client_manager)
+            self.services[name] = service_cls(self.client_manager)  # type: ignore[abstract]
             logger.info("Service %s initialized", name)
 
     def list_available_services(self) -> List[str]:

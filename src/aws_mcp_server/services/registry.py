@@ -2,7 +2,7 @@
 
 import logging
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from ..aws_client import AWSClientManager
 from ..cache import TTLCache
@@ -10,6 +10,8 @@ from ..config import Config
 from ..metrics import MetricsCollector, default_collector
 from ..rate_limiter import RateLimiter
 from .base import BaseService, ServiceError
+from .cloudwatch import CloudWatchService
+from .cost_explorer import CostExplorerService
 from .dynamodb import DynamoDBService
 from .ec2 import EC2Service
 from .iam import IAMService
@@ -23,13 +25,15 @@ logger = logging.getLogger(__name__)
 _CACHEABLE_PREFIXES = ("list_", "describe_", "get_")
 
 # All known service classes keyed by their service name.
-_SERVICE_CLASSES = {
-    "ec2": EC2Service,
-    "s3": S3Service,
-    "lambda": LambdaService,
+_SERVICE_CLASSES: Dict[str, Callable[[AWSClientManager], BaseService]] = {
+    "ce": CostExplorerService,
+    "cloudwatch": CloudWatchService,
     "dynamodb": DynamoDBService,
-    "rds": RDSService,
+    "ec2": EC2Service,
     "iam": IAMService,
+    "lambda": LambdaService,
+    "rds": RDSService,
+    "s3": S3Service,
 }
 
 
@@ -149,18 +153,14 @@ class ServiceRegistry:
         service_name, operation = self._split_tool_name(tool_name)
         service = self.services.get(service_name)
         if service is None:
-            raise ServiceError(
-                f"Service '{service_name}' is not enabled", code="ServiceNotEnabled"
-            )
+            raise ServiceError(f"Service '{service_name}' is not enabled", code="ServiceNotEnabled")
 
         cache_key = None
         if self._is_cacheable(operation):
             cache_key = f"{tool_name}:{sorted(params.items())}"
             cached = self.cache.get(cache_key)
             if cached is not None:
-                self.metrics.inc_counter(
-                    "aws_mcp_cache_hits_total", service=service_name
-                )
+                self.metrics.inc_counter("aws_mcp_cache_hits_total", service=service_name)
                 return cached
 
         start = time.monotonic()

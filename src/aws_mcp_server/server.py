@@ -8,18 +8,19 @@ from fastapi.responses import PlainTextResponse
 
 from .config import Config
 from .metrics import MetricsCollector, default_collector
+from .middleware import ErrorHandlerMiddleware, LoggingMiddleware
 from .models import (
     ErrorResponse,
     ExecuteRequest,
     ExecuteResponse,
     HealthResponse,
     ServicesResponse,
+    ToolDescriptor,
     ToolsResponse,
 )
 from .rate_limiter import RateLimitExceeded
 from .services import ServiceRegistry
 from .services.base import ServiceError
-from .middleware import ErrorHandlerMiddleware, LoggingMiddleware
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +111,10 @@ class MCPServer:
         async def list_tools() -> ToolsResponse:
             """List every available tool across enabled services."""
             tools = self.service_registry.get_available_tools()
-            return ToolsResponse(count=len(tools), tools=tools)
+            return ToolsResponse(
+                count=len(tools),
+                tools=[ToolDescriptor(**tool) for tool in tools],
+            )
 
         @app.post(
             "/execute",
@@ -121,9 +125,7 @@ class MCPServer:
                 429: {"model": ErrorResponse},
             },
         )
-        async def execute_tool(
-            body: ExecuteRequest, request: Request
-        ) -> ExecuteResponse:
+        async def execute_tool(body: ExecuteRequest, request: Request) -> ExecuteResponse:
             """Execute an AWS service tool with the given parameters."""
             try:
                 result = await self.service_registry.execute_tool(
@@ -131,9 +133,7 @@ class MCPServer:
                     body.params,
                     client_id=self._client_id(request),
                 )
-                return ExecuteResponse(
-                    status="success", tool_name=body.tool_name, result=result
-                )
+                return ExecuteResponse(status="success", tool_name=body.tool_name, result=result)
             except RateLimitExceeded as exc:
                 raise HTTPException(
                     status_code=429,

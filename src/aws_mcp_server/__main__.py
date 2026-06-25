@@ -1,10 +1,11 @@
 """Entry point for AWS MCP Server."""
 
 import asyncio
-import sys
 import logging
-from .server import MCPServer
+import sys
+
 from .config import Config
+from .server import MCPServer
 
 
 def setup_logging(config: Config) -> None:

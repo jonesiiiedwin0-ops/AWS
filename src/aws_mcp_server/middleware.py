@@ -1,6 +1,7 @@
 """Middleware for the MCP server."""
 
 import time
+
 import structlog
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware

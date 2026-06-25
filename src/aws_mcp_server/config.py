@@ -23,12 +23,8 @@ class Config(BaseSettings):
 
     # AWS Configuration
     aws_region: str = Field(default="us-east-1", description="AWS region")
-    aws_access_key_id: Optional[str] = Field(
-        default=None, description="AWS access key ID"
-    )
-    aws_secret_access_key: Optional[str] = Field(
-        default=None, description="AWS secret access key"
-    )
+    aws_access_key_id: Optional[str] = Field(default=None, description="AWS access key ID")
+    aws_secret_access_key: Optional[str] = Field(default=None, description="AWS secret access key")
     aws_profile: Optional[str] = Field(default=None, description="AWS profile name")
 
     # Server Configuration

@@ -1,68 +1,94 @@
-"""DynamoDB service integration."""
+"""DynamoDB service integration (read-only)."""
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 
 from .base import BaseService
 
 
 class DynamoDBService(BaseService):
-    """DynamoDB NoSQL database operations."""
+    """DynamoDB NoSQL database operations (read-only)."""
 
     service_name = "dynamodb"
     display_name = "DynamoDB"
-    description = "Fully managed NoSQL key-value and document database"
+    description = "Fully managed NoSQL key-value and document database (read-only access)"
 
     def _build_tools(self) -> Dict[str, Callable]:
         return {
             "list_tables": self.list_tables,
             "describe_table": self.describe_table,
-            "get_item": self.get_item,
-            "query": self.query,
+            "table_info": self.table_info,
         }
 
     async def list_tables(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """List DynamoDB tables."""
+        """List all DynamoDB tables in the region."""
         client = self.get_client(params.get("region"))
-        response = client.list_tables(Limit=params.get("limit", 100))
+
+        all_tables: List[str] = []
+        exclusive_start_table_name = None
+
+        while True:
+            kwargs = {"Limit": 100}
+            if exclusive_start_table_name:
+                kwargs["ExclusiveStartTableName"] = exclusive_start_table_name
+
+            response = client.list_tables(**kwargs)
+            all_tables.extend(response.get("TableNames", []))
+
+            if "LastEvaluatedTableName" not in response:
+                break
+            exclusive_start_table_name = response["LastEvaluatedTableName"]
+
         return {
-            "count": len(response.get("TableNames", [])),
-            "tables": response.get("TableNames", []),
+            "count": len(all_tables),
+            "tables": all_tables,
+            "region": params.get("region", "default"),
         }
 
     async def describe_table(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """Describe a DynamoDB table."""
+        """Describe a single DynamoDB table."""
         client = self.get_client(params.get("region"))
         response = client.describe_table(TableName=params["table_name"])
         table = response.get("Table", {})
         return {
             "name": table.get("TableName"),
             "status": table.get("TableStatus"),
-            "item_count": table.get("ItemCount"),
-            "size_bytes": table.get("TableSizeBytes"),
+            "item_count": table.get("ItemCount", 0),
+            "size_bytes": table.get("TableSizeBytes", 0),
             "key_schema": table.get("KeySchema", []),
+            "attributes": table.get("AttributeDefinitions", []),
+            "throughput": table.get("BillingModeSummary", table.get("ProvisionedThroughput", {})),
         }
 
-    async def get_item(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """Get a single item by key."""
+    async def table_info(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Get comprehensive table information and statistics."""
         client = self.get_client(params.get("region"))
-        response = client.get_item(
-            TableName=params["table_name"],
-            Key=params["key"],
-        )
-        return {"found": "Item" in response, "item": response.get("Item")}
+        response = client.describe_table(TableName=params["table_name"])
+        table = response.get("Table", {})
 
-    async def query(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """Query a table using a key condition expression."""
-        client = self.get_client(params.get("region"))
-        query_kwargs: Dict[str, Any] = {
-            "TableName": params["table_name"],
-            "KeyConditionExpression": params["key_condition_expression"],
-            "Limit": params.get("limit", 100),
-        }
-        if values := params.get("expression_attribute_values"):
-            query_kwargs["ExpressionAttributeValues"] = values
-        response = client.query(**query_kwargs)
+        global_secondary_indexes = []
+        for gsi in table.get("GlobalSecondaryIndexes", []):
+            global_secondary_indexes.append(
+                {
+                    "name": gsi.get("IndexName"),
+                    "status": gsi.get("IndexStatus"),
+                    "key_schema": gsi.get("KeySchema", []),
+                    "provisioned_throughput": gsi.get(
+                        "ProvisionedThroughput", gsi.get("BillingModeSummary", {})
+                    ),
+                }
+            )
+
         return {
-            "count": response.get("Count", 0),
-            "items": response.get("Items", []),
+            "table_name": table.get("TableName"),
+            "arn": table.get("TableArn"),
+            "status": table.get("TableStatus"),
+            "creation_time": str(table.get("CreationDateTime", "")),
+            "item_count": table.get("ItemCount", 0),
+            "size_bytes": table.get("TableSizeBytes", 0),
+            "billing_mode": table.get("BillingModeSummary", {}).get("BillingMode", "PROVISIONED"),
+            "key_schema": table.get("KeySchema", []),
+            "attributes": table.get("AttributeDefinitions", []),
+            "global_secondary_indexes": global_secondary_indexes,
+            "stream_specification": table.get("StreamSpecification", {}),
+            "ttl": table.get("TimeToLiveDescription", {}),
         }

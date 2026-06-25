@@ -65,9 +65,7 @@ class IAMService(BaseService):
         ]
         return {"count": len(roles), "roles": roles}
 
-    async def list_attached_user_policies(
-        self, params: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def list_attached_user_policies(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """List managed policies attached to a user."""
         client = self.get_client(params.get("region"))
         response = client.list_attached_user_policies(UserName=params["username"])

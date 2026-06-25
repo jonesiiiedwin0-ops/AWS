@@ -48,9 +48,7 @@ class AWSClientManager:
 
             if self.config.aws_access_key_id and self.config.aws_secret_access_key:
                 session_kwargs["aws_access_key_id"] = self.config.aws_access_key_id
-                session_kwargs["aws_secret_access_key"] = (
-                    self.config.aws_secret_access_key
-                )
+                session_kwargs["aws_secret_access_key"] = self.config.aws_secret_access_key
             elif self.config.aws_profile:
                 session_kwargs["profile_name"] = self.config.aws_profile
 
@@ -74,9 +72,7 @@ class AWSClientManager:
 
         if cache_key not in self._clients:
             boto_config = self._boto_config.merge(BotoConfig(region_name=region))
-            self._clients[cache_key] = self.session.client(
-                service_name, config=boto_config
-            )
+            self._clients[cache_key] = self.session.client(service_name, config=boto_config)
             logger.debug("Created %s client for region %s", service_name, region)
 
         return self._clients[cache_key]

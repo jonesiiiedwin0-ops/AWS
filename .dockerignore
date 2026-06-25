@@ -62,5 +62,6 @@ docs/_build/
 
 # Misc
 *.md
+!README.md
 LICENSE
 CONTRIBUTING.md

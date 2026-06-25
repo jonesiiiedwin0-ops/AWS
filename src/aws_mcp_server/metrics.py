@@ -68,16 +68,14 @@ class MetricsCollector:
                 for labelset, value in series.items():
                     lines.append(f"{name}{self._fmt_labels(labelset)} {value}")
 
-            for name, series in self._histograms.items():
+            for name, hist_series in self._histograms.items():
                 lines.append(f"# TYPE {name} histogram")
-                for labelset, values in series.items():
+                for labelset, values in hist_series.items():
                     lines.extend(self._render_histogram(name, labelset, values))
 
         return "\n".join(lines) + "\n"
 
-    def _render_histogram(
-        self, name: str, labelset: LabelSet, values: List[float]
-    ) -> List[str]:
+    def _render_histogram(self, name: str, labelset: LabelSet, values: List[float]) -> List[str]:
         out: List[str] = []
         count = len(values)
         total = sum(values)

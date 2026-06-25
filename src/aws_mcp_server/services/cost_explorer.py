@@ -1,7 +1,7 @@
 """Cost Explorer service integration (read-only)."""
 
-from typing import Any, Callable, Dict
 from datetime import datetime, timedelta
+from typing import Any, Callable, Dict
 
 from .base import BaseService
 
@@ -35,9 +35,7 @@ class CostExplorerService(BaseService):
             },
             "Granularity": params.get("granularity", "DAILY"),  # DAILY, MONTHLY
             "Metrics": params.get("metrics", ["UnblendedCost"]),
-            "GroupBy": [
-                {"Type": "DIMENSION", "Key": params.get("group_by", "SERVICE")}
-            ],
+            "GroupBy": [{"Type": "DIMENSION", "Key": params.get("group_by", "SERVICE")}],
         }
 
         if filter_dict := params.get("filter"):
@@ -51,13 +49,15 @@ class CostExplorerService(BaseService):
             groups = result.get("Groups", [])
 
             for group in groups:
-                results.append({
-                    "start_date": time_period.get("Start"),
-                    "end_date": time_period.get("End"),
-                    "dimension": group.get("Keys", [""])[0],
-                    "metrics": group.get("Metrics", {}),
-                    "estimated": result.get("Estimated", False),
-                })
+                results.append(
+                    {
+                        "start_date": time_period.get("Start"),
+                        "end_date": time_period.get("End"),
+                        "dimension": group.get("Keys", [""])[0],
+                        "metrics": group.get("Metrics", {}),
+                        "estimated": result.get("Estimated", False),
+                    }
+                )
 
         # Calculate totals
         total_cost = 0.0
@@ -104,14 +104,20 @@ class CostExplorerService(BaseService):
             mean_value = item.get("MeanValue")
             preds = item.get("PredictionIntervalContents", {})
 
-            forecasts.append({
-                "start_date": time_period.get("Start"),
-                "end_date": time_period.get("End"),
-                "mean_value": float(mean_value) if mean_value else 0.0,
-                "prediction_lower_bound": float(preds.get("LowerBound", 0)) if preds.get("LowerBound") else None,
-                "prediction_upper_bound": float(preds.get("UpperBound", 0)) if preds.get("UpperBound") else None,
-                "total": item.get("Total", {}),
-            })
+            forecasts.append(
+                {
+                    "start_date": time_period.get("Start"),
+                    "end_date": time_period.get("End"),
+                    "mean_value": float(mean_value) if mean_value else 0.0,
+                    "prediction_lower_bound": (
+                        float(preds.get("LowerBound", 0)) if preds.get("LowerBound") else None
+                    ),
+                    "prediction_upper_bound": (
+                        float(preds.get("UpperBound", 0)) if preds.get("UpperBound") else None
+                    ),
+                    "total": item.get("Total", {}),
+                }
+            )
 
         return {
             "start_date": start_date.isoformat(),

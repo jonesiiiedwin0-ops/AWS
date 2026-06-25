@@ -1,7 +1,7 @@
 """CloudWatch service integration (read-only)."""
 
-from typing import Any, Callable, Dict, List
 from datetime import datetime, timedelta
+from typing import Any, Callable, Dict, List
 
 from .base import BaseService
 
@@ -40,13 +40,15 @@ class CloudWatchService(BaseService):
             response = client.list_metrics(**kwargs)
 
             for metric in response.get("Metrics", []):
-                all_metrics.append({
-                    "namespace": metric.get("Namespace"),
-                    "metric_name": metric.get("MetricName"),
-                    "dimensions": metric.get("Dimensions", []),
-                    "statistics": metric.get("Statistics", []),
-                    "unit": metric.get("Unit"),
-                })
+                all_metrics.append(
+                    {
+                        "namespace": metric.get("Namespace"),
+                        "metric_name": metric.get("MetricName"),
+                        "dimensions": metric.get("Dimensions", []),
+                        "statistics": metric.get("Statistics", []),
+                        "unit": metric.get("Unit"),
+                    }
+                )
 
             if "NextToken" not in response:
                 break
@@ -70,22 +72,24 @@ class CloudWatchService(BaseService):
 
         alarms = []
         for alarm in response.get("MetricAlarms", []):
-            alarms.append({
-                "alarm_name": alarm.get("AlarmName"),
-                "alarm_arn": alarm.get("AlarmArn"),
-                "state_value": alarm.get("StateValue"),
-                "state_reason": alarm.get("StateReason"),
-                "metric_name": alarm.get("MetricName"),
-                "namespace": alarm.get("Namespace"),
-                "statistic": alarm.get("Statistic"),
-                "dimensions": alarm.get("Dimensions", []),
-                "threshold": alarm.get("Threshold"),
-                "comparison_operator": alarm.get("ComparisonOperator"),
-                "period": alarm.get("Period"),
-                "evaluation_periods": alarm.get("EvaluationPeriods"),
-                "enabled": alarm.get("ActionsEnabled"),
-                "alarm_description": alarm.get("AlarmDescription"),
-            })
+            alarms.append(
+                {
+                    "alarm_name": alarm.get("AlarmName"),
+                    "alarm_arn": alarm.get("AlarmArn"),
+                    "state_value": alarm.get("StateValue"),
+                    "state_reason": alarm.get("StateReason"),
+                    "metric_name": alarm.get("MetricName"),
+                    "namespace": alarm.get("Namespace"),
+                    "statistic": alarm.get("Statistic"),
+                    "dimensions": alarm.get("Dimensions", []),
+                    "threshold": alarm.get("Threshold"),
+                    "comparison_operator": alarm.get("ComparisonOperator"),
+                    "period": alarm.get("Period"),
+                    "evaluation_periods": alarm.get("EvaluationPeriods"),
+                    "enabled": alarm.get("ActionsEnabled"),
+                    "alarm_description": alarm.get("AlarmDescription"),
+                }
+            )
 
         return {
             "count": len(alarms),
@@ -117,15 +121,17 @@ class CloudWatchService(BaseService):
 
         datapoints = []
         for dp in response.get("Datapoints", []):
-            datapoints.append({
-                "timestamp": str(dp.get("Timestamp", "")),
-                "average": dp.get("Average"),
-                "sum": dp.get("Sum"),
-                "minimum": dp.get("Minimum"),
-                "maximum": dp.get("Maximum"),
-                "sample_count": dp.get("SampleCount"),
-                "unit": dp.get("Unit"),
-            })
+            datapoints.append(
+                {
+                    "timestamp": str(dp.get("Timestamp", "")),
+                    "average": dp.get("Average"),
+                    "sum": dp.get("Sum"),
+                    "minimum": dp.get("Minimum"),
+                    "maximum": dp.get("Maximum"),
+                    "sample_count": dp.get("SampleCount"),
+                    "unit": dp.get("Unit"),
+                }
+            )
 
         return {
             "metric_name": params["metric_name"],

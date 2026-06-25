@@ -67,12 +67,16 @@ class DynamoDBService(BaseService):
 
         global_secondary_indexes = []
         for gsi in table.get("GlobalSecondaryIndexes", []):
-            global_secondary_indexes.append({
-                "name": gsi.get("IndexName"),
-                "status": gsi.get("IndexStatus"),
-                "key_schema": gsi.get("KeySchema", []),
-                "provisioned_throughput": gsi.get("ProvisionedThroughput", gsi.get("BillingModeSummary", {})),
-            })
+            global_secondary_indexes.append(
+                {
+                    "name": gsi.get("IndexName"),
+                    "status": gsi.get("IndexStatus"),
+                    "key_schema": gsi.get("KeySchema", []),
+                    "provisioned_throughput": gsi.get(
+                        "ProvisionedThroughput", gsi.get("BillingModeSummary", {})
+                    ),
+                }
+            )
 
         return {
             "table_name": table.get("TableName"),

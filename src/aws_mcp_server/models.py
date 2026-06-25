@@ -12,7 +12,7 @@ class HealthResponse(BaseModel):
     services: List[str] = Field(..., description="Initialized AWS services")
     version: str = Field(..., description="Server version")
     credentials_valid: Optional[bool] = Field(
-        None, description="Whether AWS credentials verified successfully"
+        default=None, description="Whether AWS credentials verified successfully"
     )
 
 
@@ -47,9 +47,7 @@ class ExecuteRequest(BaseModel):
         description="Tool to execute, '<service>_<operation>'",
         examples=["ec2_list_instances", "s3_list_buckets"],
     )
-    params: Dict[str, Any] = Field(
-        default_factory=dict, description="Operation parameters"
-    )
+    params: Dict[str, Any] = Field(default_factory=dict, description="Operation parameters")
 
 
 class ExecuteResponse(BaseModel):
@@ -57,12 +55,12 @@ class ExecuteResponse(BaseModel):
 
     status: str = Field(..., description="'success' or 'error'")
     tool_name: str = Field(..., description="Tool that was executed")
-    result: Optional[Any] = Field(None, description="Operation result on success")
-    error: Optional[str] = Field(None, description="Error message on failure")
+    result: Optional[Any] = Field(default=None, description="Operation result on success")
+    error: Optional[str] = Field(default=None, description="Error message on failure")
 
 
 class ErrorResponse(BaseModel):
     """Standard error envelope."""
 
     detail: str = Field(..., description="Error message")
-    code: Optional[str] = Field(None, description="Machine-readable error code")
+    code: Optional[str] = Field(default=None, description="Machine-readable error code")

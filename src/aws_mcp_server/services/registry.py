@@ -14,6 +14,7 @@ from .dynamodb import DynamoDBService
 from .ec2 import EC2Service
 from .iam import IAMService
 from .lambda_service import LambdaService
+from .playwright_service import PlaywrightError, PlaywrightService
 from .rds import RDSService
 from .s3 import S3Service
 
@@ -30,6 +31,11 @@ _SERVICE_CLASSES = {
     "dynamodb": DynamoDBService,
     "rds": RDSService,
     "iam": IAMService,
+}
+
+# Services that don't use AWS clients (lifecycle managed separately).
+_NON_AWS_SERVICES = {
+    "playwright": PlaywrightService,
 }
 
 
@@ -71,6 +77,11 @@ class ServiceRegistry:
     def _initialize_services(self) -> None:
         """Instantiate enabled services."""
         for name in self.config.enabled_services:
+            if name in _NON_AWS_SERVICES:
+                self.services[name] = _NON_AWS_SERVICES[name]()
+                logger.info("Service %s initialized", name)
+                continue
+
             service_cls = _SERVICE_CLASSES.get(name)
             if service_cls is None:
                 logger.warning("Unknown service '%s' in enabled_services", name)
@@ -170,6 +181,9 @@ class ServiceRegistry:
             if cache_key is not None:
                 self.cache.set(cache_key, result)
             return result
+        except (PlaywrightError, ServiceError):
+            status = "error"
+            raise
         except Exception:
             status = "error"
             raise

@@ -19,6 +19,7 @@ from .models import (
 from .rate_limiter import RateLimitExceeded
 from .services import ServiceRegistry
 from .services.base import ServiceError
+from .services.playwright_service import PlaywrightError
 from .middleware import ErrorHandlerMiddleware, LoggingMiddleware
 
 logger = logging.getLogger(__name__)
@@ -140,7 +141,7 @@ class MCPServer:
                     detail=str(exc),
                     headers={"Retry-After": str(int(exc.retry_after) + 1)},
                 )
-            except ServiceError as exc:
+            except (ServiceError, PlaywrightError) as exc:
                 logger.warning("Tool %s failed: %s", body.tool_name, exc)
                 raise HTTPException(status_code=400, detail=str(exc))
 

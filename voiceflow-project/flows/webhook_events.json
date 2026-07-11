@@ -1,0 +1,96 @@
+{
+  "name": "webhook_events",
+  "description": "Process Resend webhook events",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_event_type"
+    },
+    {
+      "id": "capture_event_type",
+      "type": "choice",
+      "prompt": "Which webhook event to process?",
+      "buttons": [
+        { "label": "email.sent", "value": "email.sent" },
+        { "label": "email.delivered", "value": "email.delivered" },
+        { "label": "email.bounced", "value": "email.bounced" },
+        { "label": "email.complained", "value": "email.complained" },
+        { "label": "email.opened", "value": "email.opened" },
+        { "label": "email.clicked", "value": "email.clicked" },
+        { "label": "template.sent", "value": "template.sent" }
+      ],
+      "entity": "webhook_event_type",
+      "next": "capture_event_data"
+    },
+    {
+      "id": "capture_event_data",
+      "type": "capture",
+      "entity": "webhook_event_data",
+      "prompt": "Enter webhook event data (JSON):",
+      "next": "capture_notify"
+    },
+    {
+      "id": "capture_notify",
+      "type": "choice",
+      "prompt": "Send proactive notification via Voiceflow?",
+      "buttons": [
+        { "label": "Yes", "value": "yes" },
+        { "label": "No", "value": "no" }
+      ],
+      "next": "process_notify"
+    },
+    {
+      "id": "process_notify",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "yes", "next": "capture_user_id" }
+      ],
+      "defaultNext": "call_webhook_function"
+    },
+    {
+      "id": "capture_user_id",
+      "type": "capture",
+      "entity": "notify_user_id",
+      "prompt": "User ID to notify:",
+      "next": "call_webhook_function"
+    },
+    {
+      "id": "call_webhook_function",
+      "type": "function",
+      "function": "handleWebhook",
+      "params": {
+        "eventType": "{{webhook_event_type}}",
+        "eventData": "{{#json webhook_event_data}}{{/json}}",
+        "notifyUser": "{{#eq notify_user 'yes'}}true{{else}}false{{/eq}}",
+        "userId": "{{#if notify_user_id}}{{notify_user_id}}{{/if}}"
+      },
+      "next": "handle_webhook_result"
+    },
+    {
+      "id": "handle_webhook_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "webhook_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "webhook_error" }
+      ],
+      "defaultNext": "webhook_error"
+    },
+    {
+      "id": "webhook_success",
+      "type": "speak",
+      "message": "✅ Webhook event processed!\n\n**Event:** {{eventType}}\n**Data:** {{eventData}}\n{{#if notificationSent}}**Notification sent to user:** {{userId}}{{/if}}",
+      "next": "end"
+    },
+    {
+      "id": "webhook_error",
+      "type": "speak",
+      "message": "❌ Error processing webhook: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

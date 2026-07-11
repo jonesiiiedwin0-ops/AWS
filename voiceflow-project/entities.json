@@ -206,6 +206,30 @@
       "type": "custom",
       "values": [],
       "description": "New value for update"
+    },
+    {
+      "name": "webhook_event_type",
+      "type": "custom",
+      "values": ["email.sent", "email.delivered", "email.bounced", "email.complained", "email.opened", "email.clicked", "template.sent"],
+      "description": "Resend webhook event type"
+    },
+    {
+      "name": "webhook_event_data",
+      "type": "custom",
+      "values": [],
+      "description": "Webhook event payload as JSON"
+    },
+    {
+      "name": "notify_user",
+      "type": "custom",
+      "values": ["yes", "no"],
+      "description": "Send proactive notification"
+    },
+    {
+      "name": "notify_user_id",
+      "type": "custom",
+      "values": [],
+      "description": "User ID for notification"
     }
   ]
 }

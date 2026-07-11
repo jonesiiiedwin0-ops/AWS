@@ -63,6 +63,16 @@
       ]
     },
     {
+      "name": "webhook_events",
+      "description": "Process Resend webhook events",
+      "entities": ["webhook_event_type", "webhook_event_data", "notify_user", "notify_user_id"],
+      "examples": [
+        "Process webhook email.sent",
+        "Handle webhook email.delivered with data",
+        "Process webhook template.sent"
+      ]
+    },
+    {
       "name": "help",
       "description": "Show available commands and examples",
       "entities": [],

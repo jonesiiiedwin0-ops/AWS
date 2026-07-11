@@ -11,14 +11,14 @@
       "id": "welcome",
       "type": "speak",
       "messages": [
-        "👋 Welcome to Resend AI Agent! I can help you send emails, check delivery status, manage domains, contacts, and templates. What would you like to do?"
+        "👋 Welcome to Resend AI Agent! I can help you send emails, check delivery status, manage domains, contacts, templates, and process webhook events. What would you like to do?"
       ],
       "next": "listen"
     },
     {
       "id": "listen",
       "type": "intent",
-      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "manage_templates", "help"],
+      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "manage_templates", "webhook_events", "help"],
       "capture": {
         "send_email": "send_email_flow",
         "check_email_status": "check_status_flow",
@@ -26,6 +26,7 @@
         "verify_domain": "verify_domain_flow",
         "manage_contacts": "manage_contacts_flow",
         "manage_templates": "manage_templates_flow",
+        "webhook_events": "webhook_events_flow",
         "help": "help_flow"
       },
       "fallback": "fallback_flow"
@@ -67,6 +68,12 @@
       "next": "continue_prompt"
     },
     {
+      "id": "webhook_events_flow",
+      "type": "flow",
+      "flow": "webhook_events",
+      "next": "continue_prompt"
+    },
+    {
       "id": "help_flow",
       "type": "flow",
       "flow": "help",
@@ -89,6 +96,7 @@
         { "label": "Verify domain", "value": "verify_domain" },
         { "label": "Manage contacts", "value": "manage_contacts" },
         { "label": "Manage templates", "value": "manage_templates" },
+        { "label": "Webhook events", "value": "webhook_events" },
         { "label": "Help", "value": "help" },
         { "label": "Done", "value": "done" }
       ],
@@ -104,6 +112,7 @@
         { "field": "value", "operator": "equals", "value": "verify_domain", "next": "verify_domain_flow" },
         { "field": "value", "operator": "equals", "value": "manage_contacts", "next": "manage_contacts_flow" },
         { "field": "value", "operator": "equals", "value": "manage_templates", "next": "manage_templates_flow" },
+        { "field": "value", "operator": "equals", "value": "webhook_events", "next": "webhook_events_flow" },
         { "field": "value", "operator": "equals", "value": "help", "next": "help_flow" }
       ],
       "defaultNext": "goodbye"

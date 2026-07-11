@@ -1,0 +1,71 @@
+{
+  "name": "analytics",
+  "description": "View email analytics and statistics",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_period"
+    },
+    {
+      "id": "capture_period",
+      "type": "choice",
+      "prompt": "Select time period for analytics:",
+      "buttons": [
+        { "label": "Last 24 hours", "value": "1d" },
+        { "label": "Last 7 days", "value": "7d" },
+        { "label": "Last 30 days", "value": "30d" },
+        { "label": "Last 90 days", "value": "90d" }
+      ],
+      "entity": "analytics_period",
+      "next": "capture_group_by"
+    },
+    {
+      "id": "capture_group_by",
+      "type": "choice",
+      "prompt": "Group by:",
+      "buttons": [
+        { "label": "Day", "value": "day" },
+        { "label": "Week", "value": "week" },
+        { "label": "Hour", "value": "hour" }
+      ],
+      "entity": "analytics_group_by",
+      "next": "call_analytics_function"
+    },
+    {
+      "id": "call_analytics_function",
+      "type": "function",
+      "function": "getAnalytics",
+      "params": {
+        "period": "{{analytics_period}}",
+        "groupBy": "{{analytics_group_by}}"
+      },
+      "next": "handle_analytics_result"
+    },
+    {
+      "id": "handle_analytics_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "analytics_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "analytics_error" }
+      ],
+      "defaultNext": "analytics_error"
+    },
+    {
+      "id": "analytics_success",
+      "type": "speak",
+      "message": "📊 **Email Analytics ({{period}})**\n\n**Overview:**\n• Total emails: {{stats.total}}\n• Sent: {{stats.sent}}\n• Delivered: {{stats.delivered}} ({{stats.deliveryRate}}%)\n• Bounced: {{stats.bounced}} ({{stats.bounceRate}}%)\n• Complained: {{stats.complained}} ({{stats.complaintRate}}%)\n\n**By Status:**\n{{#each stats.byStatus}}\n• {{@key}}: {{this}}\n{{/each}}\n\n**Top Domains:**\n{{#each stats.byDomain}}\n• {{@key}}: {{this}}\n{{/each}}\n\n**Daily Volume:**\n{{#each stats.byDay}}\n• {{@key}}: {{this}} emails\n{{/each}}",
+      "next": "end"
+    },
+    {
+      "id": "analytics_error",
+      "type": "speak",
+      "message": "❌ Error fetching analytics: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

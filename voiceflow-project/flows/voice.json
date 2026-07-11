@@ -1,0 +1,132 @@
+{
+  "name": "voice",
+  "description": "Voice interaction flow for Voiceflow Voice",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "welcome_voice"
+    },
+    {
+      "id": "welcome_voice",
+      "type": "function",
+      "function": "voiceIntegration",
+      "params": {
+        "action": "speak",
+        "text": "Welcome to Resend AI Agent. I can help you send emails, check delivery status, manage contacts, templates, and audiences. What would you like to do?",
+        "voice": "alloy"
+      },
+      "next": "listen_voice"
+    },
+    {
+      "id": "listen_voice",
+      "type": "function",
+      "function": "voiceIntegration",
+      "params": {
+        "action": "listen",
+        "language": "en-US",
+        "maxDuration": 10,
+        "silenceTimeout": 3
+      },
+      "next": "process_voice_input"
+    },
+    {
+      "id": "process_voice_input",
+      "type": "intent",
+      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "manage_templates", "manage_audiences", "send_batch", "help"],
+      "capture": {
+        "send_email": "voice_send_email",
+        "check_email_status": "voice_check_status",
+        "list_emails": "voice_list_emails",
+        "verify_domain": "voice_verify_domain",
+        "manage_contacts": "voice_manage_contacts",
+        "manage_templates": "voice_manage_templates",
+        "manage_audiences": "voice_manage_audiences",
+        "send_batch": "voice_send_batch",
+        "help": "voice_help"
+      },
+      "fallback": "voice_fallback"
+    },
+    {
+      "id": "voice_send_email",
+      "type": "flow",
+      "flow": "send_email",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_check_status",
+      "type": "flow",
+      "flow": "check_email_status",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_list_emails",
+      "type": "flow",
+      "flow": "list_emails",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_verify_domain",
+      "type": "flow",
+      "flow": "verify_domain",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_manage_contacts",
+      "type": "flow",
+      "flow": "manage_contacts",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_manage_templates",
+      "type": "flow",
+      "flow": "manage_templates",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_manage_audiences",
+      "type": "flow",
+      "flow": "manage_audiences",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_send_batch",
+      "type": "flow",
+      "flow": "send_batch",
+      "next": "voice_continue"
+    },
+    {
+      "id": "voice_help",
+      "type": "function",
+      "function": "voiceIntegration",
+      "params": {
+        "action": "speak",
+        "text": "You can say things like: Send an email to john@example.com with subject Welcome. Check status of email. List emails. Verify domain example.com. Add contact to audience. Create template. Create audience. Send batch. Or say Help for more options.",
+        "voice": "alloy"
+      },
+      "next": "listen_voice"
+    },
+    {
+      "id": "voice_fallback",
+      "type": "function",
+      "function": "voiceIntegration",
+      "params": {
+        "action": "speak",
+        "text": "I didn't catch that. Please try saying: Send email, Check status, List emails, Verify domain, Manage contacts, Manage templates, Manage audiences, Send batch, or Help.",
+        "voice": "alloy"
+      },
+      "next": "listen_voice"
+    },
+    {
+      "id": "voice_continue",
+      "type": "function",
+      "function": "voiceIntegration",
+      "params": {
+        "action": "speak",
+        "text": "Is there anything else I can help you with?",
+        "voice": "alloy"
+      },
+      "next": "listen_voice"
+    }
+  ]
+}

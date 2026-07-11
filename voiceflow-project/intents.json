@@ -95,6 +95,26 @@
       ]
     },
     {
+      "name": "analytics",
+      "description": "View email analytics and statistics",
+      "entities": ["analytics_period", "analytics_group_by"],
+      "examples": [
+        "Show analytics for last 7 days",
+        "Email statistics for last 30 days",
+        "Daily email volume report"
+      ]
+    },
+    {
+      "name": "voice",
+      "description": "Voice interaction for Voiceflow Voice",
+      "entities": [],
+      "examples": [
+        "Talk to Resend agent",
+        "Voice mode",
+        "Start voice call"
+      ]
+    },
+    {
       "name": "help",
       "description": "Show available commands and examples",
       "entities": [],

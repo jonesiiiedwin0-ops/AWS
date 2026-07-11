@@ -321,6 +321,18 @@
       "type": "custom",
       "values": [],
       "description": "Batch email tags"
+    },
+    {
+      "name": "analytics_period",
+      "type": "custom",
+      "values": ["1d", "7d", "30d", "90d"],
+      "description": "Analytics period: 1d, 7d, 30d, 90d"
+    },
+    {
+      "name": "analytics_group_by",
+      "type": "custom",
+      "values": ["hour", "day", "week"],
+      "description": "Group analytics by hour, day, or week"
     }
   ]
 }

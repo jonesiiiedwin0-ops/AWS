@@ -11,14 +11,14 @@
       "id": "welcome",
       "type": "speak",
       "messages": [
-        "👋 Welcome to Resend AI Agent! I can help you send emails, check delivery status, manage domains, contacts, templates, audiences, send batch emails, and process webhook events. What would you like to do?"
+        "👋 Welcome to Resend AI Agent! I can help you send emails, check delivery status, manage domains, contacts, templates, audiences, send batch emails, view analytics, process webhooks, and even talk via voice. What would you like to do?"
       ],
       "next": "listen"
     },
     {
       "id": "listen",
       "type": "intent",
-      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "manage_templates", "manage_audiences", "send_batch", "webhook_events", "help"],
+      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "manage_templates", "manage_audiences", "send_batch", "analytics", "voice", "webhook_events", "help"],
       "capture": {
         "send_email": "send_email_flow",
         "check_email_status": "check_status_flow",
@@ -28,6 +28,8 @@
         "manage_templates": "manage_templates_flow",
         "manage_audiences": "manage_audiences_flow",
         "send_batch": "send_batch_flow",
+        "analytics": "analytics_flow",
+        "voice": "voice_flow",
         "webhook_events": "webhook_events_flow",
         "help": "help_flow"
       },
@@ -82,6 +84,18 @@
       "next": "continue_prompt"
     },
     {
+      "id": "analytics_flow",
+      "type": "flow",
+      "flow": "analytics",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "voice_flow",
+      "type": "flow",
+      "flow": "voice",
+      "next": "end"
+    },
+    {
       "id": "webhook_events_flow",
       "type": "flow",
       "flow": "webhook_events",
@@ -112,6 +126,8 @@
         { "label": "Manage templates", "value": "manage_templates" },
         { "label": "Manage audiences", "value": "manage_audiences" },
         { "label": "Send batch", "value": "send_batch" },
+        { "label": "View analytics", "value": "analytics" },
+        { "label": "Voice mode", "value": "voice" },
         { "label": "Webhook events", "value": "webhook_events" },
         { "label": "Help", "value": "help" },
         { "label": "Done", "value": "done" }
@@ -130,6 +146,8 @@
         { "field": "value", "operator": "equals", "value": "manage_templates", "next": "manage_templates_flow" },
         { "field": "value", "operator": "equals", "value": "manage_audiences", "next": "manage_audiences_flow" },
         { "field": "value", "operator": "equals", "value": "send_batch", "next": "send_batch_flow" },
+        { "field": "value", "operator": "equals", "value": "analytics", "next": "analytics_flow" },
+        { "field": "value", "operator": "equals", "value": "voice", "next": "voice_flow" },
         { "field": "value", "operator": "equals", "value": "webhook_events", "next": "webhook_events_flow" },
         { "field": "value", "operator": "equals", "value": "help", "next": "help_flow" }
       ],

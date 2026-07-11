@@ -11,20 +11,21 @@
       "id": "welcome",
       "type": "speak",
       "messages": [
-        "👋 Welcome to Resend AI Agent! I can help you send emails, check delivery status, manage domains, and handle contacts. What would you like to do?"
+        "👋 Welcome to Resend AI Agent! I can help you send emails, check delivery status, manage domains, contacts, and templates. What would you like to do?"
       ],
       "next": "listen"
     },
     {
       "id": "listen",
       "type": "intent",
-      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "help"],
+      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "manage_templates", "help"],
       "capture": {
         "send_email": "send_email_flow",
         "check_email_status": "check_status_flow",
         "list_emails": "list_emails_flow",
         "verify_domain": "verify_domain_flow",
         "manage_contacts": "manage_contacts_flow",
+        "manage_templates": "manage_templates_flow",
         "help": "help_flow"
       },
       "fallback": "fallback_flow"
@@ -60,6 +61,12 @@
       "next": "continue_prompt"
     },
     {
+      "id": "manage_templates_flow",
+      "type": "flow",
+      "flow": "manage_templates",
+      "next": "continue_prompt"
+    },
+    {
       "id": "help_flow",
       "type": "flow",
       "flow": "help",
@@ -76,11 +83,12 @@
       "type": "choice",
       "message": "What else can I help you with?",
       "buttons": [
-        { "label": "Send another email", "value": "send_email" },
+        { "label": "Send email", "value": "send_email" },
         { "label": "Check email status", "value": "check_email_status" },
         { "label": "List emails", "value": "list_emails" },
         { "label": "Verify domain", "value": "verify_domain" },
         { "label": "Manage contacts", "value": "manage_contacts" },
+        { "label": "Manage templates", "value": "manage_templates" },
         { "label": "Help", "value": "help" },
         { "label": "Done", "value": "done" }
       ],
@@ -95,6 +103,7 @@
         { "field": "value", "operator": "equals", "value": "list_emails", "next": "list_emails_flow" },
         { "field": "value", "operator": "equals", "value": "verify_domain", "next": "verify_domain_flow" },
         { "field": "value", "operator": "equals", "value": "manage_contacts", "next": "manage_contacts_flow" },
+        { "field": "value", "operator": "equals", "value": "manage_templates", "next": "manage_templates_flow" },
         { "field": "value", "operator": "equals", "value": "help", "next": "help_flow" }
       ],
       "defaultNext": "goodbye"

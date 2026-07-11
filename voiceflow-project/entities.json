@@ -43,6 +43,17 @@
       "description": "Comma-separated tags for tracking"
     },
     {
+      "name": "content_type",
+      "type": "custom",
+      "values": ["html", "text", "both"],
+      "description": "Content type selection"
+    },
+    {
+      "name": "scheduled_at",
+      "type": "datetime",
+      "description": "ISO 8601 datetime for scheduled sending"
+    },
+    {
       "name": "email_id",
       "type": "regex",
       "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
@@ -111,6 +122,90 @@
       "name": "contact_unsubscribed",
       "type": "boolean",
       "description": "Whether contact is unsubscribed"
+    },
+    {
+      "name": "template_action",
+      "type": "custom",
+      "values": ["create", "list", "send", "get", "update", "delete"],
+      "description": "Template management action"
+    },
+    {
+      "name": "template_name",
+      "type": "custom",
+      "values": [],
+      "description": "Template name"
+    },
+    {
+      "name": "template_subject",
+      "type": "custom",
+      "values": [],
+      "description": "Template subject with variables"
+    },
+    {
+      "name": "template_html",
+      "type": "custom",
+      "values": [],
+      "description": "Template HTML content"
+    },
+    {
+      "name": "template_text",
+      "type": "custom",
+      "values": [],
+      "description": "Template text content"
+    },
+    {
+      "name": "template_variables",
+      "type": "custom",
+      "values": [],
+      "description": "Comma-separated variable names"
+    },
+    {
+      "name": "template_id",
+      "type": "regex",
+      "pattern": "^tpl_[0-9]+_[a-z0-9]+$",
+      "description": "Template ID"
+    },
+    {
+      "name": "send_to",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Send template to email"
+    },
+    {
+      "name": "send_from",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Send template from email"
+    },
+    {
+      "name": "send_reply_to",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Reply-to for template send"
+    },
+    {
+      "name": "send_tags",
+      "type": "custom",
+      "values": [],
+      "description": "Tags for template send"
+    },
+    {
+      "name": "send_variables",
+      "type": "custom",
+      "values": [],
+      "description": "JSON variable values for template"
+    },
+    {
+      "name": "update_field",
+      "type": "custom",
+      "values": ["name", "subject", "html", "text", "variables"],
+      "description": "Template field to update"
+    },
+    {
+      "name": "update_value",
+      "type": "custom",
+      "values": [],
+      "description": "New value for update"
     }
   ]
 }

@@ -1,0 +1,396 @@
+{
+  "name": "manage_templates",
+  "description": "Manage email templates (create, list, send, update, delete)",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_action"
+    },
+    {
+      "id": "capture_action",
+      "type": "choice",
+      "prompt": "What would you like to do with templates?",
+      "buttons": [
+        { "label": "Create template", "value": "create" },
+        { "label": "List templates", "value": "list" },
+        { "label": "Send from template", "value": "send" },
+        { "label": "View template", "value": "get" },
+        { "label": "Update template", "value": "update" },
+        { "label": "Delete template", "value": "delete" }
+      ],
+      "entity": "template_action",
+      "next": "route_action"
+    },
+    {
+      "id": "route_action",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "create", "next": "create_name" },
+        { "field": "value", "operator": "equals", "value": "list", "next": "list_templates_function" },
+        { "field": "value", "operator": "equals", "value": "send", "next": "send_template_id" },
+        { "field": "value", "operator": "equals", "value": "get", "next": "get_template_id" },
+        { "field": "value", "operator": "equals", "value": "update", "next": "update_template_id" },
+        { "field": "value", "operator": "equals", "value": "delete", "next": "delete_template_id" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "create_name",
+      "type": "capture",
+      "entity": "template_name",
+      "prompt": "Template name (e.g., welcome_email):",
+      "next": "create_subject"
+    },
+    {
+      "id": "create_subject",
+      "type": "capture",
+      "entity": "template_subject",
+      "prompt": "Subject line (use {{variable}} for placeholders):",
+      "next": "create_html"
+    },
+    {
+      "id": "create_html",
+      "type": "capture",
+      "entity": "template_html",
+      "prompt": "HTML content (use {{variable}} for placeholders):",
+      "next": "create_text"
+    },
+    {
+      "id": "create_text",
+      "type": "capture",
+      "entity": "template_text",
+      "prompt": "Text content (optional, use {{variable}} for placeholders):",
+      "required": false,
+      "next": "create_variables"
+    },
+    {
+      "id": "create_variables",
+      "type": "capture",
+      "entity": "template_variables",
+      "prompt": "Variable names (comma-separated, e.g., name,company,link):",
+      "required": false,
+      "next": "create_template_function"
+    },
+    {
+      "id": "create_template_function",
+      "type": "function",
+      "function": "manageTemplates",
+      "params": {
+        "action": "create",
+        "name": "{{template_name}}",
+        "subject": "{{template_subject}}",
+        "htmlContent": "{{template_html}}",
+        "textContent": "{{template_text}}",
+        "variables": "{{template_variables}}"
+      },
+      "next": "handle_create_result"
+    },
+    {
+      "id": "handle_create_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "create_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "create_error" }
+      ],
+      "defaultNext": "create_error"
+    },
+    {
+      "id": "create_success",
+      "type": "speak",
+      "message": "✅ Template created!\n\n**ID:** {{template.id}}\n**Name:** {{template.name}}\n**Subject:** {{template.subject}}\n**Variables:** {{template.variables.join(', ')}}\n\nUse this ID to send emails from this template.",
+      "next": "end"
+    },
+    {
+      "id": "create_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "list_templates_function",
+      "type": "function",
+      "function": "manageTemplates",
+      "params": { "action": "list" },
+      "next": "handle_list_result"
+    },
+    {
+      "id": "handle_list_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "list_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "list_error" }
+      ],
+      "defaultNext": "list_error"
+    },
+    {
+      "id": "list_success",
+      "type": "speak",
+      "message": "{{#if templates.length}}\n📋 **Templates ({{count}}):**\n\n{{#each templates}}\n**{{@index + 1}}.** {{name}} ({{id}})\n   Subject: {{subject}}\n   Variables: {{variables.join(', ') || 'none'}}\n   Created: {{createdAt}}\n---\n{{/each}}\n{{else}}\n📭 No templates created yet.\n{{/if}}",
+      "next": "end"
+    },
+    {
+      "id": "list_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "send_template_id",
+      "type": "capture",
+      "entity": "template_id",
+      "prompt": "Template ID to send:",
+      "next": "send_to"
+    },
+    {
+      "id": "send_to",
+      "type": "capture",
+      "entity": "send_to",
+      "prompt": "Recipient email:",
+      "next": "send_from"
+    },
+    {
+      "id": "send_from",
+      "type": "capture",
+      "entity": "send_from",
+      "prompt": "From email (verified domain):",
+      "next": "send_variables"
+    },
+    {
+      "id": "send_variables",
+      "type": "capture",
+      "entity": "send_variables",
+      "prompt": "Variable values (JSON or key=value,key=value):",
+      "required": false,
+      "next": "send_optional"
+    },
+    {
+      "id": "send_optional",
+      "type": "choice",
+      "prompt": "Add optional fields?",
+      "buttons": [
+        { "label": "No, send now", "value": "none" },
+        { "label": "Reply-to", "value": "reply_to" },
+        { "label": "Tags", "value": "tags" }
+      ],
+      "next": "send_process_optional"
+    },
+    {
+      "id": "send_process_optional",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "reply_to", "next": "send_reply_to" },
+        { "field": "value", "operator": "equals", "value": "tags", "next": "send_tags" }
+      ],
+      "defaultNext": "send_template_function"
+    },
+    {
+      "id": "send_reply_to",
+      "type": "capture",
+      "entity": "send_reply_to",
+      "prompt": "Reply-to email:",
+      "required": false,
+      "next": "send_optional"
+    },
+    {
+      "id": "send_tags",
+      "type": "capture",
+      "entity": "send_tags",
+      "prompt": "Tags (comma-separated):",
+      "required": false,
+      "next": "send_optional"
+    },
+    {
+      "id": "send_template_function",
+      "type": "function",
+      "function": "manageTemplates",
+      "params": {
+        "action": "send",
+        "templateId": "{{template_id}}",
+        "to": "{{send_to}}",
+        "from": "{{send_from}}",
+        "replyTo": "{{send_reply_to}}",
+        "tags": "{{#if send_tags}}{{#split send_tags ','}}{{name: this.trim()}}{{/split}}{{/if}}",
+        "data": "{{#if send_variables}}{{#json send_variables}}{{/json}}{{else}}{}{{/if}}"
+      },
+      "next": "handle_send_result"
+    },
+    {
+      "id": "handle_send_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "send_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "send_error" }
+      ],
+      "defaultNext": "send_error"
+    },
+    {
+      "id": "send_success",
+      "type": "speak",
+      "message": "✅ Email sent from template!\n\n**Template:** {{templateName}}\n**Email ID:** {{emailId}}\n**To:** {{send_to}}",
+      "next": "end"
+    },
+    {
+      "id": "send_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "get_template_id",
+      "type": "capture",
+      "entity": "template_id",
+      "prompt": "Template ID to view:",
+      "next": "get_template_function"
+    },
+    {
+      "id": "get_template_function",
+      "type": "function",
+      "function": "manageTemplates",
+      "params": { "action": "get", "templateId": "{{template_id}}" },
+      "next": "handle_get_result"
+    },
+    {
+      "id": "handle_get_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "get_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "get_error" }
+      ],
+      "defaultNext": "get_error"
+    },
+    {
+      "id": "get_success",
+      "type": "speak",
+      "message": "📄 **Template: {{template.name}}**\n\n**ID:** {{template.id}}\n**Subject:** {{template.subject}}\n**Variables:** {{template.variables.join(', ') || 'none'}}\n\n**HTML:**\n{{template.htmlContent}}\n\n**Text:**\n{{template.textContent || '(none)'}}\n\n**Created:** {{template.createdAt}}\n**Updated:** {{template.updatedAt}}",
+      "next": "end"
+    },
+    {
+      "id": "get_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "update_template_id",
+      "type": "capture",
+      "entity": "template_id",
+      "prompt": "Template ID to update:",
+      "next": "update_field"
+    },
+    {
+      "id": "update_field",
+      "type": "choice",
+      "prompt": "Which field to update?",
+      "buttons": [
+        { "label": "Name", "value": "name" },
+        { "label": "Subject", "value": "subject" },
+        { "label": "HTML Content", "value": "html" },
+        { "label": "Text Content", "value": "text" },
+        { "label": "Variables", "value": "variables" }
+      ],
+      "entity": "update_field",
+      "next": "update_value"
+    },
+    {
+      "id": "update_value",
+      "type": "capture",
+      "entity": "update_value",
+      "prompt": "New value for {{update_field}}:",
+      "next": "update_template_function"
+    },
+    {
+      "id": "update_template_function",
+      "type": "function",
+      "function": "manageTemplates",
+      "params": {
+        "action": "update",
+        "templateId": "{{template_id}}",
+        "name": "{{#eq update_field 'name'}}{{update_value}}{{/eq}}",
+        "subject": "{{#eq update_field 'subject'}}{{update_value}}{{/eq}}",
+        "htmlContent": "{{#eq update_field 'html'}}{{update_value}}{{/eq}}",
+        "textContent": "{{#eq update_field 'text'}}{{update_value}}{{/eq}}",
+        "variables": "{{#eq update_field 'variables'}}{{update_value}}{{/eq}}"
+      },
+      "next": "handle_update_result"
+    },
+    {
+      "id": "handle_update_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "update_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "update_error" }
+      ],
+      "defaultNext": "update_error"
+    },
+    {
+      "id": "update_success",
+      "type": "speak",
+      "message": "✅ Template updated!\n\n**ID:** {{template.id}}\n**Name:** {{template.name}}\n**Subject:** {{template.subject}}",
+      "next": "end"
+    },
+    {
+      "id": "update_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "delete_template_id",
+      "type": "capture",
+      "entity": "template_id",
+      "prompt": "Template ID to delete:",
+      "next": "confirm_delete"
+    },
+    {
+      "id": "confirm_delete",
+      "type": "choice",
+      "prompt": "Delete template {{template_id}}? This cannot be undone.",
+      "buttons": [
+        { "label": "Yes, delete", "value": "yes" },
+        { "label": "No, cancel", "value": "no" }
+      ],
+      "next": "delete_process"
+    },
+    {
+      "id": "delete_process",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "yes", "next": "delete_template_function" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "delete_template_function",
+      "type": "function",
+      "function": "manageTemplates",
+      "params": { "action": "delete", "templateId": "{{template_id}}" },
+      "next": "handle_delete_result"
+    },
+    {
+      "id": "handle_delete_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "delete_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "delete_error" }
+      ],
+      "defaultNext": "delete_error"
+    },
+    {
+      "id": "delete_success",
+      "type": "speak",
+      "message": "✅ Template deleted successfully.",
+      "next": "end"
+    },
+    {
+      "id": "delete_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

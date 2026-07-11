@@ -3,7 +3,7 @@
     {
       "name": "send_email",
       "description": "Send transactional or marketing email via Resend",
-      "entities": ["to_email", "from_email", "email_subject", "html_content", "text_content", "reply_to", "email_tags"],
+      "entities": ["to_email", "from_email", "email_subject", "html_content", "text_content", "reply_to", "email_tags", "content_type", "scheduled_at"],
       "examples": [
         "Send an email to john@example.com with subject Welcome and html content <h1>Hello!</h1>",
         "Email jane@company.com from noreply@mydomain.com subject Newsletter html <p>News</p>",
@@ -48,6 +48,18 @@
         "Add contact john@example.com to audience abc-123",
         "Update contact jane@example.com in audience xyz-789 first name Jane",
         "Unsubscribe user@test.com from audience def-456"
+      ]
+    },
+    {
+      "name": "manage_templates",
+      "description": "Manage email templates (create, list, send, update, delete)",
+      "entities": ["template_action", "template_name", "template_subject", "template_html", "template_text", "template_variables", "template_id", "send_to", "send_from", "send_variables", "update_field", "update_value"],
+      "examples": [
+        "Create template welcome_email subject Welcome {{name}} html <h1>Hi {{name}}!</h1>",
+        "List templates",
+        "Send template tpl_123 to user@example.com from onboarding@myapp.com variables {\"name\":\"John\"}",
+        "Update template tpl_123 subject New Subject",
+        "Delete template tpl_123"
       ]
     },
     {

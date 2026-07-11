@@ -133,6 +133,45 @@
       ]
     },
     {
+      "name": "manage_tenants",
+      "description": "Multi-tenant management (create, list, get, update, delete)",
+      "entities": ["tenant_action", "tenant_name", "tenant_key", "tenant_plan", "tenant_id"],
+      "examples": [
+        "Create tenant acme with re_xxx key pro plan",
+        "List tenants",
+        "Get tenant tenant_abc"
+      ]
+    },
+    {
+      "name": "manage_workspaces",
+      "description": "Team workspace management (create, list, members, roles)",
+      "entities": ["ws_action", "ws_name", "ws_owner", "ws_id", "ws_member", "ws_role"],
+      "examples": [
+        "Create workspace Growth Team owned by admin@acme.com",
+        "Add member jane@acme.com to workspace ws_123 as editor",
+        "Set role of bob@acme.com to admin in ws_123"
+      ]
+    },
+    {
+      "name": "analytics_dashboard",
+      "description": "Advanced analytics dashboard view",
+      "entities": ["dash_period", "dash_workspace"],
+      "examples": [
+        "Show analytics dashboard for last 30 days",
+        "Dashboard for workspace ws_123"
+      ]
+    },
+    {
+      "name": "manage_whitelabel",
+      "description": "White-label settings (brand, logo, color, footer)",
+      "entities": ["wl_action", "wl_workspace", "wl_brand_name", "wl_logo", "wl_color", "wl_footer"],
+      "examples": [
+        "Set white-label for ws_123 brand Acme primary color #6366f1",
+        "Get white-label settings for ws_123",
+        "Reset white-label for ws_123"
+      ]
+    },
+    {
       "name": "help",
       "description": "Show available commands and examples",
       "entities": [],

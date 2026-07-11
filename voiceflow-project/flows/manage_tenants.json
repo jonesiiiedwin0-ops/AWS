@@ -1,0 +1,34 @@
+{
+  "name": "manage_tenants",
+  "description": "Multi-tenant management (create, list, get, update, delete)",
+  "nodes": [
+    { "id": "start", "type": "start", "next": "capture_action" },
+    { "id": "capture_action", "type": "choice", "prompt": "Tenant action?", "buttons": [
+      { "label": "Create", "value": "create" }, { "label": "List", "value": "list" },
+      { "label": "Get", "value": "get" }, { "label": "Update", "value": "update" }, { "label": "Delete", "value": "delete" }
+    ], "entity": "tenant_action", "next": "route" },
+    { "id": "route", "type": "condition", "conditions": [
+      { "field": "tenant_action", "operator": "equals", "value": "create", "next": "t_name" },
+      { "field": "tenant_action", "operator": "equals", "value": "list", "next": "call" },
+      { "field": "tenant_action", "operator": "equals", "value": "get", "next": "t_id" },
+      { "field": "tenant_action", "operator": "equals", "value": "update", "next": "t_id" },
+      { "field": "tenant_action", "operator": "equals", "value": "delete", "next": "t_id" }
+    ], "defaultNext": "end" },
+    { "id": "t_name", "type": "capture", "entity": "tenant_name", "prompt": "Tenant name:", "next": "t_key" },
+    { "id": "t_key", "type": "capture", "entity": "tenant_key", "prompt": "Resend API key (re_...):", "next": "t_plan" },
+    { "id": "t_plan", "type": "choice", "prompt": "Plan?", "buttons": [
+      { "label": "Free", "value": "free" }, { "label": "Pro", "value": "pro" }, { "label": "Enterprise", "value": "enterprise" }
+    ], "entity": "tenant_plan", "next": "call" },
+    { "id": "t_id", "type": "capture", "entity": "tenant_id", "prompt": "Tenant ID:", "next": "call" },
+    { "id": "call", "type": "function", "function": "manageTenants", "params": {
+      "action": "{{tenant_action}}", "tenantId": "{{tenant_id}}", "name": "{{tenant_name}}",
+      "resendApiKey": "{{tenant_key}}", "plan": "{{tenant_plan}}"
+    }, "next": "result" },
+    { "id": "result", "type": "condition", "conditions": [
+      { "field": "success", "operator": "equals", "value": true, "next": "ok" }
+    ], "defaultNext": "err" },
+    { "id": "ok", "type": "speak", "message": "✅ {{message}}\n\n{{#if tenant}}Tenant: {{tenant.name}} ({{tenant.id}}) — plan {{tenant.plan}}{{/if}}{{#if tenants.length}}Found {{count}} tenants.{{/if}}", "next": "end" },
+    { "id": "err", "type": "speak", "message": "❌ Error: {{error}}", "next": "end" },
+    { "id": "end", "type": "end" }
+  ]
+}

@@ -32,6 +32,10 @@
         "voice": "voice_flow",
         "run_ab_test": "run_ab_test_flow",
         "schedule_campaign": "schedule_campaign_flow",
+        "manage_tenants": "manage_tenants_flow",
+        "manage_workspaces": "manage_workspaces_flow",
+        "analytics_dashboard": "analytics_dashboard_flow",
+        "manage_whitelabel": "manage_whitelabel_flow",
         "webhook_events": "webhook_events_flow",
         "help": "help_flow"
       },
@@ -110,6 +114,30 @@
       "next": "continue_prompt"
     },
     {
+      "id": "manage_tenants_flow",
+      "type": "flow",
+      "flow": "manage_tenants",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "manage_workspaces_flow",
+      "type": "flow",
+      "flow": "manage_workspaces",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "analytics_dashboard_flow",
+      "type": "flow",
+      "flow": "analytics_dashboard",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "manage_whitelabel_flow",
+      "type": "flow",
+      "flow": "manage_whitelabel",
+      "next": "continue_prompt"
+    },
+    {
       "id": "webhook_events_flow",
       "type": "flow",
       "flow": "webhook_events",
@@ -144,6 +172,10 @@
         { "label": "Voice mode", "value": "voice" },
         { "label": "Run A/B test", "value": "run_ab_test" },
         { "label": "Schedule campaign", "value": "schedule_campaign" },
+        { "label": "Manage tenants", "value": "manage_tenants" },
+        { "label": "Manage workspaces", "value": "manage_workspaces" },
+        { "label": "Analytics dashboard", "value": "analytics_dashboard" },
+        { "label": "White-label", "value": "manage_whitelabel" },
         { "label": "Webhook events", "value": "webhook_events" },
         { "label": "Help", "value": "help" },
         { "label": "Done", "value": "done" }
@@ -166,6 +198,10 @@
         { "field": "value", "operator": "equals", "value": "voice", "next": "voice_flow" },
         { "field": "value", "operator": "equals", "value": "run_ab_test", "next": "run_ab_test_flow" },
         { "field": "value", "operator": "equals", "value": "schedule_campaign", "next": "schedule_campaign_flow" },
+        { "field": "value", "operator": "equals", "value": "manage_tenants", "next": "manage_tenants_flow" },
+        { "field": "value", "operator": "equals", "value": "manage_workspaces", "next": "manage_workspaces_flow" },
+        { "field": "value", "operator": "equals", "value": "analytics_dashboard", "next": "analytics_dashboard_flow" },
+        { "field": "value", "operator": "equals", "value": "manage_whitelabel", "next": "manage_whitelabel_flow" },
         { "field": "value", "operator": "equals", "value": "webhook_events", "next": "webhook_events_flow" },
         { "field": "value", "operator": "equals", "value": "help", "next": "help_flow" }
       ],

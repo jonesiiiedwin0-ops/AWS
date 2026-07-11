@@ -1,0 +1,25 @@
+{
+  "name": "manage_whitelabel",
+  "description": "White-label settings (brand, logo, color, footer)",
+  "nodes": [
+    { "id": "start", "type": "start", "next": "capture_action" },
+    { "id": "capture_action", "type": "choice", "prompt": "White-label action?", "buttons": [
+      { "label": "Set", "value": "set" }, { "label": "Get", "value": "get" }, { "label": "Reset", "value": "delete" }
+    ], "entity": "wl_action", "next": "ws_id" },
+    { "id": "ws_id", "type": "capture", "entity": "wl_workspace", "prompt": "Workspace ID:", "next": "wl_brand" },
+    { "id": "wl_brand", "type": "capture", "entity": "wl_brand_name", "prompt": "Brand name (optional):", "required": false, "next": "wl_logo" },
+    { "id": "wl_logo", "type": "capture", "entity": "wl_logo", "prompt": "Logo URL (optional):", "required": false, "next": "wl_color" },
+    { "id": "wl_color", "type": "capture", "entity": "wl_color", "prompt": "Primary color hex (optional, e.g., #6366f1):", "required": false, "next": "wl_footer" },
+    { "id": "wl_footer", "type": "capture", "entity": "wl_footer", "prompt": "Footer text (optional):", "required": false, "next": "call" },
+    { "id": "call", "type": "function", "function": "manageWhiteLabel", "params": {
+      "action": "{{wl_action}}", "workspaceId": "{{wl_workspace}}", "brandName": "{{wl_brand_name}}",
+      "logoUrl": "{{wl_logo}}", "primaryColor": "{{wl_color}}", "footerText": "{{wl_footer}}"
+    }, "next": "result" },
+    { "id": "result", "type": "condition", "conditions": [
+      { "field": "success", "operator": "equals", "value": true, "next": "ok" }
+    ], "defaultNext": "err" },
+    { "id": "ok", "type": "speak", "message": "✅ {{message}}{{#if settings}}\n\nBrand: {{settings.brandName}}\nLogo: {{settings.logoUrl}}\nColor: {{settings.primaryColor}}\nFooter: {{settings.footerText}}{{/if}}", "next": "end" },
+    { "id": "err", "type": "speak", "message": "❌ Error: {{error}}", "next": "end" },
+    { "id": "end", "type": "end" }
+  ]
+}

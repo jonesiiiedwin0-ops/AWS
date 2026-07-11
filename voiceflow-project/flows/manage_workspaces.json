@@ -1,0 +1,35 @@
+{
+  "name": "manage_workspaces",
+  "description": "Team workspace management (create, list, members, roles)",
+  "nodes": [
+    { "id": "start", "type": "start", "next": "capture_action" },
+    { "id": "capture_action", "type": "choice", "prompt": "Workspace action?", "buttons": [
+      { "label": "Create", "value": "create" }, { "label": "List", "value": "list" },
+      { "label": "Add member", "value": "add_member" }, { "label": "Set role", "value": "set_role" },
+      { "label": "Remove member", "value": "remove_member" }, { "label": "Delete", "value": "delete" }
+    ], "entity": "ws_action", "next": "route" },
+    { "id": "route", "type": "condition", "conditions": [
+      { "field": "ws_action", "operator": "equals", "value": "create", "next": "ws_name" },
+      { "field": "ws_action", "operator": "equals", "value": "list", "next": "call" },
+      { "field": "ws_action", "operator": "equals", "value": "delete", "next": "ws_id" }
+    ], "defaultNext": "ws_id" },
+    { "id": "ws_name", "type": "capture", "entity": "ws_name", "prompt": "Workspace name:", "next": "ws_owner" },
+    { "id": "ws_owner", "type": "capture", "entity": "ws_owner", "prompt": "Owner email:", "next": "call" },
+    { "id": "ws_id", "type": "capture", "entity": "ws_id", "prompt": "Workspace ID:", "next": "ws_member" },
+    { "id": "ws_member", "type": "capture", "entity": "ws_member", "prompt": "Member email (for add/remove/role):", "required": false, "next": "ws_role" },
+    { "id": "ws_role", "type": "choice", "prompt": "Role?", "buttons": [
+      { "label": "Owner", "value": "owner" }, { "label": "Admin", "value": "admin" },
+      { "label": "Editor", "value": "editor" }, { "label": "Viewer", "value": "viewer" }
+    ], "entity": "ws_role", "required": false, "next": "call" },
+    { "id": "call", "type": "function", "function": "manageWorkspaces", "params": {
+      "action": "{{ws_action}}", "workspaceId": "{{ws_id}}", "name": "{{ws_name}}",
+      "ownerId": "{{ws_owner}}", "memberEmail": "{{ws_member}}", "role": "{{ws_role}}"
+    }, "next": "result" },
+    { "id": "result", "type": "condition", "conditions": [
+      { "field": "success", "operator": "equals", "value": true, "next": "ok" }
+    ], "defaultNext": "err" },
+    { "id": "ok", "type": "speak", "message": "✅ {{message}}{{#if workspace}}\n\nWorkspace: {{workspace.name}} ({{workspace.id}})\nMembers: {{#each workspace.members}}{{this.email}} [{{this.role}}] {{/each}}{{/if}}", "next": "end" },
+    { "id": "err", "type": "speak", "message": "❌ Error: {{error}}", "next": "end" },
+    { "id": "end", "type": "end" }
+  ]
+}

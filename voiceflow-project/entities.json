@@ -387,6 +387,120 @@
       "type": "custom",
       "values": [],
       "description": "Comma-separated recipient emails for a campaign"
+    },
+    {
+      "name": "tenant_action",
+      "type": "custom",
+      "values": ["create", "list", "get", "update", "delete"],
+      "description": "Tenant management action"
+    },
+    {
+      "name": "tenant_name",
+      "type": "custom",
+      "values": [],
+      "description": "Tenant name"
+    },
+    {
+      "name": "tenant_key",
+      "type": "custom",
+      "values": [],
+      "description": "Tenant Resend API key (re_...)"
+    },
+    {
+      "name": "tenant_plan",
+      "type": "custom",
+      "values": ["free", "pro", "enterprise"],
+      "description": "Tenant plan"
+    },
+    {
+      "name": "tenant_id",
+      "type": "custom",
+      "values": [],
+      "description": "Tenant ID"
+    },
+    {
+      "name": "ws_action",
+      "type": "custom",
+      "values": ["create", "list", "add_member", "remove_member", "set_role", "delete"],
+      "description": "Workspace management action"
+    },
+    {
+      "name": "ws_name",
+      "type": "custom",
+      "values": [],
+      "description": "Workspace name"
+    },
+    {
+      "name": "ws_owner",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Workspace owner email"
+    },
+    {
+      "name": "ws_id",
+      "type": "custom",
+      "values": [],
+      "description": "Workspace ID"
+    },
+    {
+      "name": "ws_member",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Workspace member email"
+    },
+    {
+      "name": "ws_role",
+      "type": "custom",
+      "values": ["owner", "admin", "editor", "viewer"],
+      "description": "Workspace member role"
+    },
+    {
+      "name": "dash_period",
+      "type": "custom",
+      "values": ["1d", "7d", "30d", "90d"],
+      "description": "Dashboard period"
+    },
+    {
+      "name": "dash_workspace",
+      "type": "custom",
+      "values": [],
+      "description": "Dashboard workspace ID filter"
+    },
+    {
+      "name": "wl_action",
+      "type": "custom",
+      "values": ["set", "get", "delete"],
+      "description": "White-label action"
+    },
+    {
+      "name": "wl_workspace",
+      "type": "custom",
+      "values": [],
+      "description": "White-label workspace ID"
+    },
+    {
+      "name": "wl_brand_name",
+      "type": "custom",
+      "values": [],
+      "description": "White-label brand name"
+    },
+    {
+      "name": "wl_logo",
+      "type": "custom",
+      "values": [],
+      "description": "White-label logo URL"
+    },
+    {
+      "name": "wl_color",
+      "type": "custom",
+      "values": [],
+      "description": "White-label primary color hex"
+    },
+    {
+      "name": "wl_footer",
+      "type": "custom",
+      "values": [],
+      "description": "White-label footer text"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "name": "Resend AI Agent",
-  "description": "Voiceflow agent for managing Resend emails, domains, contacts, templates, audiences, batches, analytics, voice, and webhooks",
-  "version": "1.4.0",
+  "description": "Voiceflow agent for managing Resend emails, domains, contacts, templates, audiences, batches, analytics, voice, A/B tests, campaigns, multi-tenancy, workspaces, dashboards, and white-labeling",
+  "version": "1.5.0",
   "language": "en-US",
   "timezone": "UTC",
   "intents": "intents.json",
@@ -21,6 +21,10 @@
     "flows/voice.json",
     "flows/run_ab_test.json",
     "flows/schedule_campaign.json",
+    "flows/manage_tenants.json",
+    "flows/manage_workspaces.json",
+    "flows/analytics_dashboard.json",
+    "flows/manage_whitelabel.json",
     "flows/help.json",
     "flows/fallback.json"
   ],
@@ -38,7 +42,11 @@
     "functions/getAnalytics.js",
     "functions/voiceIntegration.js",
     "functions/runABTest.js",
-    "functions/scheduleCampaign.js"
+    "functions/scheduleCampaign.js",
+    "functions/manageTenants.js",
+    "functions/manageWorkspaces.js",
+    "functions/getDashboard.js",
+    "functions/manageWhiteLabel.js"
   ],
   "environmentVariables": [
     "RESEND_API_KEY",

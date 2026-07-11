@@ -1,0 +1,21 @@
+{
+  "name": "analytics_dashboard",
+  "description": "Advanced analytics dashboard view",
+  "nodes": [
+    { "id": "start", "type": "start", "next": "capture_period" },
+    { "id": "capture_period", "type": "choice", "prompt": "Dashboard period?", "buttons": [
+      { "label": "24h", "value": "1d" }, { "label": "7d", "value": "7d" },
+      { "label": "30d", "value": "30d" }, { "label": "90d", "value": "90d" }
+    ], "entity": "dash_period", "next": "capture_ws" },
+    { "id": "capture_ws", "type": "capture", "entity": "dash_workspace", "prompt": "Workspace ID (optional):", "required": false, "next": "call" },
+    { "id": "call", "type": "function", "function": "getDashboard", "params": {
+      "period": "{{dash_period}}", "workspaceId": "{{dash_workspace}}"
+    }, "next": "result" },
+    { "id": "result", "type": "condition", "conditions": [
+      { "field": "success", "operator": "equals", "value": true, "next": "ok" }
+    ], "defaultNext": "err" },
+    { "id": "ok", "type": "speak", "message": "📊 **Dashboard ({{dashboard.period}})**\n\nTotal: {{dashboard.total}} | Sent: {{dashboard.sent}} | Delivered: {{dashboard.delivered}}\nDelivery rate: {{dashboard.deliveryRate}}% | Bounce: {{dashboard.bounceRate}}% | Complaint: {{dashboard.complaintRate}}%\n\nStatus breakdown:\n{{#each dashboard.byStatus}}• {{@key}}: {{this}}\n{{/each}}\n\nTop domains:\n{{#each dashboard.topDomains}}• {{this.[0]}}: {{this.[1]}}\n{{/each}}", "next": "end" },
+    { "id": "err", "type": "speak", "message": "❌ Error: {{error}}", "next": "end" },
+    { "id": "end", "type": "end" }
+  ]
+}

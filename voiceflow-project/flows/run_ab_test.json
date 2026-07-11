@@ -1,0 +1,114 @@
+{
+  "name": "run_ab_test",
+  "description": "Run an A/B test between two email variants",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_test_name"
+    },
+    {
+      "id": "capture_test_name",
+      "type": "capture",
+      "entity": "ab_test_name",
+      "prompt": "Name this A/B test (e.g., summer_promo):",
+      "next": "capture_from"
+    },
+    {
+      "id": "capture_from",
+      "type": "capture",
+      "entity": "from_email",
+      "prompt": "From address (verified domain):",
+      "next": "capture_subject_a"
+    },
+    {
+      "id": "capture_subject_a",
+      "type": "capture",
+      "entity": "ab_subject_a",
+      "prompt": "Variant A subject line:",
+      "next": "capture_html_a"
+    },
+    {
+      "id": "capture_html_a",
+      "type": "capture",
+      "entity": "ab_html_a",
+      "prompt": "Variant A HTML content:",
+      "next": "capture_subject_b"
+    },
+    {
+      "id": "capture_subject_b",
+      "type": "capture",
+      "entity": "ab_subject_b",
+      "prompt": "Variant B subject line:",
+      "next": "capture_html_b"
+    },
+    {
+      "id": "capture_html_b",
+      "type": "capture",
+      "entity": "ab_html_b",
+      "prompt": "Variant B HTML content:",
+      "next": "capture_recipients_a"
+    },
+    {
+      "id": "capture_recipients_a",
+      "type": "capture",
+      "entity": "ab_recipients_a",
+      "prompt": "Variant A recipients (comma-separated emails):",
+      "next": "capture_recipients_b"
+    },
+    {
+      "id": "capture_recipients_b",
+      "type": "capture",
+      "entity": "ab_recipients_b",
+      "prompt": "Variant B recipients (comma-separated emails):",
+      "next": "call_ab_function"
+    },
+    {
+      "id": "call_ab_function",
+      "type": "function",
+      "function": "runABTest",
+      "params": {
+        "testName": "{{ab_test_name}}",
+        "from": "{{from_email}}",
+        "subjectA": "{{ab_subject_a}}",
+        "htmlA": "{{ab_html_a}}",
+        "subjectB": "{{ab_subject_b}}",
+        "htmlB": "{{ab_html_b}}",
+        "recipientsA": "{{#split ab_recipients_a ','}}{{this.trim()}}{{/split}}",
+        "recipientsB": "{{#split ab_recipients_b ','}}{{this.trim()}}{{/split}}"
+      },
+      "next": "handle_ab_result"
+    },
+    {
+      "id": "handle_ab_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "ab_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "ab_partial" }
+      ],
+      "defaultNext": "ab_error"
+    },
+    {
+      "id": "ab_success",
+      "type": "speak",
+      "message": "✅ {{message}}\n\nVariant A Email IDs: {{variantA.emailIds}}\nVariant B Email IDs: {{variantB.emailIds}}\n\nTrack results via the webhook dashboard.",
+      "next": "end"
+    },
+    {
+      "id": "ab_partial",
+      "type": "speak",
+      "message": "⚠️ {{message}}\n\nErrors: {{#each errors}}{{this.to}}: {{this.error}}\n{{/each}}",
+      "next": "end"
+    },
+    {
+      "id": "ab_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

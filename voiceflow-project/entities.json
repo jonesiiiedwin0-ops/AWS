@@ -333,6 +333,60 @@
       "type": "custom",
       "values": ["hour", "day", "week"],
       "description": "Group analytics by hour, day, or week"
+    },
+    {
+      "name": "ab_test_name",
+      "type": "custom",
+      "values": [],
+      "description": "A/B test name identifier"
+    },
+    {
+      "name": "ab_subject_a",
+      "type": "custom",
+      "values": [],
+      "description": "Variant A subject line"
+    },
+    {
+      "name": "ab_html_a",
+      "type": "custom",
+      "values": [],
+      "description": "Variant A HTML content"
+    },
+    {
+      "name": "ab_subject_b",
+      "type": "custom",
+      "values": [],
+      "description": "Variant B subject line"
+    },
+    {
+      "name": "ab_html_b",
+      "type": "custom",
+      "values": [],
+      "description": "Variant B HTML content"
+    },
+    {
+      "name": "ab_recipients_a",
+      "type": "custom",
+      "values": [],
+      "description": "Comma-separated recipient emails for variant A"
+    },
+    {
+      "name": "ab_recipients_b",
+      "type": "custom",
+      "values": [],
+      "description": "Comma-separated recipient emails for variant B"
+    },
+    {
+      "name": "campaign_name",
+      "type": "custom",
+      "values": [],
+      "description": "Campaign name identifier"
+    },
+    {
+      "name": "campaign_recipients",
+      "type": "custom",
+      "values": [],
+      "description": "Comma-separated recipient emails for a campaign"
     }
   ]
 }

@@ -30,6 +30,8 @@
         "send_batch": "send_batch_flow",
         "analytics": "analytics_flow",
         "voice": "voice_flow",
+        "run_ab_test": "run_ab_test_flow",
+        "schedule_campaign": "schedule_campaign_flow",
         "webhook_events": "webhook_events_flow",
         "help": "help_flow"
       },
@@ -96,6 +98,18 @@
       "next": "end"
     },
     {
+      "id": "run_ab_test_flow",
+      "type": "flow",
+      "flow": "run_ab_test",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "schedule_campaign_flow",
+      "type": "flow",
+      "flow": "schedule_campaign",
+      "next": "continue_prompt"
+    },
+    {
       "id": "webhook_events_flow",
       "type": "flow",
       "flow": "webhook_events",
@@ -128,6 +142,8 @@
         { "label": "Send batch", "value": "send_batch" },
         { "label": "View analytics", "value": "analytics" },
         { "label": "Voice mode", "value": "voice" },
+        { "label": "Run A/B test", "value": "run_ab_test" },
+        { "label": "Schedule campaign", "value": "schedule_campaign" },
         { "label": "Webhook events", "value": "webhook_events" },
         { "label": "Help", "value": "help" },
         { "label": "Done", "value": "done" }
@@ -148,6 +164,8 @@
         { "field": "value", "operator": "equals", "value": "send_batch", "next": "send_batch_flow" },
         { "field": "value", "operator": "equals", "value": "analytics", "next": "analytics_flow" },
         { "field": "value", "operator": "equals", "value": "voice", "next": "voice_flow" },
+        { "field": "value", "operator": "equals", "value": "run_ab_test", "next": "run_ab_test_flow" },
+        { "field": "value", "operator": "equals", "value": "schedule_campaign", "next": "schedule_campaign_flow" },
         { "field": "value", "operator": "equals", "value": "webhook_events", "next": "webhook_events_flow" },
         { "field": "value", "operator": "equals", "value": "help", "next": "help_flow" }
       ],

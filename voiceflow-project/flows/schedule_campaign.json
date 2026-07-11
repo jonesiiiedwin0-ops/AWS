@@ -1,0 +1,98 @@
+{
+  "name": "schedule_campaign",
+  "description": "Schedule a campaign for future delivery",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_campaign_name"
+    },
+    {
+      "id": "capture_campaign_name",
+      "type": "capture",
+      "entity": "campaign_name",
+      "prompt": "Campaign name (e.g., black_friday):",
+      "next": "capture_from"
+    },
+    {
+      "id": "capture_from",
+      "type": "capture",
+      "entity": "from_email",
+      "prompt": "From address (verified domain):",
+      "next": "capture_subject"
+    },
+    {
+      "id": "capture_subject",
+      "type": "capture",
+      "entity": "email_subject",
+      "prompt": "Subject line:",
+      "next": "capture_html"
+    },
+    {
+      "id": "capture_html",
+      "type": "capture",
+      "entity": "html_content",
+      "prompt": "HTML content:",
+      "next": "capture_recipients"
+    },
+    {
+      "id": "capture_recipients",
+      "type": "capture",
+      "entity": "campaign_recipients",
+      "prompt": "Recipients (comma-separated emails):",
+      "next": "capture_schedule"
+    },
+    {
+      "id": "capture_schedule",
+      "type": "capture",
+      "entity": "scheduled_at",
+      "prompt": "When to send? (ISO 8601, e.g., 2026-07-20T09:00:00Z):",
+      "next": "call_campaign_function"
+    },
+    {
+      "id": "call_campaign_function",
+      "type": "function",
+      "function": "scheduleCampaign",
+      "params": {
+        "campaignName": "{{campaign_name}}",
+        "from": "{{from_email}}",
+        "subject": "{{email_subject}}",
+        "html": "{{html_content}}",
+        "recipients": "{{#split campaign_recipients ','}}{{this.trim()}}{{/split}}",
+        "scheduledAt": "{{scheduled_at}}"
+      },
+      "next": "handle_campaign_result"
+    },
+    {
+      "id": "handle_campaign_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "campaign_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "campaign_partial" }
+      ],
+      "defaultNext": "campaign_error"
+    },
+    {
+      "id": "campaign_success",
+      "type": "speak",
+      "message": "✅ {{message}}\n\nEmail IDs: {{emailIds}}",
+      "next": "end"
+    },
+    {
+      "id": "campaign_partial",
+      "type": "speak",
+      "message": "⚠️ {{message}}\n\nErrors: {{#each errors}}{{this.to}}: {{this.error}}\n{{/each}}",
+      "next": "end"
+    },
+    {
+      "id": "campaign_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

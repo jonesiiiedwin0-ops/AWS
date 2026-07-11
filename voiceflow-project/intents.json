@@ -115,6 +115,24 @@
       ]
     },
     {
+      "name": "run_ab_test",
+      "description": "Run an A/B test between two email variants",
+      "entities": ["ab_test_name", "from_email", "ab_subject_a", "ab_html_a", "ab_subject_b", "ab_html_b", "ab_recipients_a", "ab_recipients_b"],
+      "examples": [
+        "Run A/B test summer_promo to two segments",
+        "A/B test subject lines for newsletter"
+      ]
+    },
+    {
+      "name": "schedule_campaign",
+      "description": "Schedule a campaign for future delivery",
+      "entities": ["campaign_name", "from_email", "email_subject", "html_content", "campaign_recipients", "scheduled_at"],
+      "examples": [
+        "Schedule campaign black_friday for 2026-07-20T09:00:00Z",
+        "Schedule newsletter to send tomorrow morning"
+      ]
+    },
+    {
       "name": "help",
       "description": "Show available commands and examples",
       "entities": [],

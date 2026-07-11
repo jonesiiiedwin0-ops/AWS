@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resend AI Agent — Email Builder</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #0f1117; color: #e6e6e6; }
+    header { background: #1a1d27; padding: 16px 24px; border-bottom: 1px solid #2a2d39; }
+    header h1 { margin: 0; font-size: 18px; }
+    header span { color: #8b8fa3; font-size: 13px; }
+    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .panel { background: #1a1d27; border: 1px solid #2a2d39; border-radius: 10px; padding: 18px; }
+    label { display: block; font-size: 12px; color: #8b8fa3; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, textarea, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2a2d39; background: #0f1117; color: #e6e6e6; font-size: 14px; }
+    textarea { min-height: 140px; font-family: monospace; }
+    button { margin-top: 16px; width: 100%; padding: 12px; border: none; border-radius: 8px; background: #6366f1; color: white; font-size: 15px; cursor: pointer; font-weight: 600; }
+    button:hover { background: #4f46e5; }
+    .preview { background: white; color: #111; padding: 20px; border-radius: 8px; min-height: 200px; overflow-wrap: anywhere; }
+    .log { font-family: monospace; font-size: 12px; background: #0f1117; border: 1px solid #2a2d39; border-radius: 8px; padding: 12px; height: 240px; overflow-y: auto; }
+    .log p { margin: 4px 0; }
+    .ok { color: #4ade80; } .err { color: #f87171; } .info { color: #60a5fa; }
+    .tag { display:inline-block; background:#2a2d39; border-radius:4px; padding:2px 8px; margin:2px; font-size:12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📧 Resend AI Agent — Email Builder</h1>
+    <span>Days 8-10 · Webhook: https://wh34c025ff0874a90e2f.free.beeceptor.com/</span>
+  </header>
+  <div class="container">
+    <div class="panel">
+      <label>To</label>
+      <input id="to" placeholder="customer@example.com" />
+      <label>From</label>
+      <input id="from" placeholder="onboarding@yourdomain.com" />
+      <label>Subject</label>
+      <input id="subject" placeholder="Welcome!" />
+      <label>Mode</label>
+      <select id="mode">
+        <option value="html">HTML</option>
+        <option value="text">Plain text</option>
+        <option value="both">Both</option>
+      </select>
+      <label>HTML Content</label>
+      <textarea id="html" placeholder="<h1>Hello {{name}}</h1>"></textarea>
+      <label>Text Content</label>
+      <textarea id="text" placeholder="Hello {{name}}"></textarea>
+      <label>Tags (comma separated)</label>
+      <input id="tags" placeholder="welcome, campaign" />
+      <label>Schedule (optional, ISO 8601)</label>
+      <input id="scheduled" placeholder="2026-07-20T09:00:00Z" />
+      <button onclick="send()">Send / Schedule Email</button>
+    </div>
+    <div class="panel">
+      <label>Live Preview</label>
+      <div class="preview" id="preview">Start typing to preview…</div>
+      <label>Webhook Event Log</label>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://wh34c025ff0874a90e2f.free.beeceptor.com/';
+
+    function log(msg, cls) {
+      const el = document.getElementById('log');
+      const p = document.createElement('p');
+      p.className = cls || 'info';
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      el.appendChild(p);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    // Live preview
+    ['html', 'text', 'subject'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderPreview);
+    });
+    function renderPreview() {
+      const html = document.getElementById('html').value;
+      const text = document.getElementById('text').value;
+      const mode = document.getElementById('mode').value;
+      const subject = document.getElementById('subject').value || '(no subject)';
+      const body = mode === 'html' ? html : (mode === 'text' ? text.replace(/\\n/g, '<br>') : (html || text));
+      document.getElementById('preview').innerHTML = `<strong>${subject}</strong><hr>${body || 'Start typing to preview…'}`;
+    }
+
+    async function send() {
+      const payload = {
+        to: document.getElementById('to').value.trim(),
+        from: document.getElementById('from').value.trim(),
+        subject: document.getElementById('subject').value.trim(),
+        mode: document.getElementById('mode').value,
+        html: document.getElementById('html').value,
+        text: document.getElementById('text').value,
+        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
+        scheduledAt: document.getElementById('scheduled').value.trim()
+      };
+
+      if (!payload.to || !payload.from || !payload.subject) {
+        log('Missing to / from / subject', 'err');
+        return;
+      }
+
+      log(`Forwarding build to webhook: ${payload.to}`, 'info');
+
+      // The builder posts to the Beeceptor webhook for inspection/tracking.
+      // A real deployment would also call the Voiceflow Dialog API or Resend API here.
+      try {
+        const resp = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'email_builder.submit', data: payload, timestamp: new Date().toISOString() })
+        });
+        if (resp.ok) {
+          log(`✅ Webhook accepted build for ${payload.to}`, 'ok');
+        } else {
+          log(`⚠️ Webhook returned ${resp.status}`, 'err');
+        }
+      } catch (e) {
+        log(`❌ Webhook error: ${e.message}`, 'err');
+      }
+    }
+
+    // Poll the webhook for any recent events (Beeceptor keeps a request log)
+    async function poll() {
+      try {
+        const resp = await fetch(WEBHOOK_URL);
+        const data = await resp.json();
+        if (data && data.status) log(`Webhook status: ${data.status}`, 'info');
+      } catch (e) { /* ignore */ }
+    }
+    setInterval(poll, 15000);
+    log('Email builder ready. Webhook tracking active.');
+  </script>
+</body>
+</html>

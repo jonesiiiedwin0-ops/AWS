@@ -19,6 +19,8 @@
     "flows/webhook_events.json",
     "flows/analytics.json",
     "flows/voice.json",
+    "flows/run_ab_test.json",
+    "flows/schedule_campaign.json",
     "flows/help.json",
     "flows/fallback.json"
   ],
@@ -34,7 +36,9 @@
     "functions/handleWebhook.js",
     "functions/addToEmailArray.js",
     "functions/getAnalytics.js",
-    "functions/voiceIntegration.js"
+    "functions/voiceIntegration.js",
+    "functions/runABTest.js",
+    "functions/scheduleCampaign.js"
   ],
   "environmentVariables": [
     "RESEND_API_KEY",

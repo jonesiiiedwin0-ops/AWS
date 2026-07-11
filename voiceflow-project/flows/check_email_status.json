@@ -1,0 +1,69 @@
+{
+  "name": "check_email_status",
+  "description": "Check delivery status of a sent email",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_email_id"
+    },
+    {
+      "id": "capture_email_id",
+      "type": "capture",
+      "entity": "email_id",
+      "prompt": "Enter the email ID to check:",
+      "validation": { "type": "regex", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+      "next": "get_email_status_function"
+    },
+    {
+      "id": "get_email_status_function",
+      "type": "function",
+      "function": "getEmailStatus",
+      "params": { "email_id": "{{email_id}}" },
+      "next": "handle_status_result"
+    },
+    {
+      "id": "handle_status_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "status_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "status_error" }
+      ],
+      "defaultNext": "status_error"
+    },
+    {
+      "id": "status_success",
+      "type": "speak",
+      "message": "📧 **Email Status: {{email_id}}**\n\n**Status:** {{status}}\n**Created:** {{created_at}}\n{{#if sent_at}}**Sent:** {{sent_at}}\n{{/if}}{{#if delivered_at}}**Delivered:** {{delivered_at}}\n{{/if}}{{#if bounced_at}}**Bounced:** {{bounced_at}}\n{{/if}}{{#if complained_at}}**Complained:** {{complained_at}}\n{{/if}}{{#if opened_at}}**Opened:** {{opened_at}}\n{{/if}}{{#if clicked_at}}**Clicked:** {{clicked_at}}\n{{/if}}",
+      "next": "check_another"
+    },
+    {
+      "id": "status_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "check_another"
+    },
+    {
+      "id": "check_another",
+      "type": "choice",
+      "prompt": "Check another email?",
+      "buttons": [
+        { "label": "Yes", "value": "yes" },
+        { "label": "No", "value": "no" }
+      ],
+      "next": "route_check"
+    },
+    {
+      "id": "route_check",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "yes", "next": "capture_email_id" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

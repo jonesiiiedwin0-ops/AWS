@@ -1,0 +1,32 @@
+{
+  "name": "Resend AI Agent",
+  "description": "Voiceflow agent for managing Resend emails, domains, and contacts",
+  "version": "1.0.0",
+  "language": "en-US",
+  "timezone": "UTC",
+  "intents": "intents.json",
+  "entities": "entities.json",
+  "flows": [
+    "flows/main.flow.json",
+    "flows/send_email.json",
+    "flows/check_email_status.json",
+    "flows/list_emails.json",
+    "flows/verify_domain.json",
+    "flows/manage_contacts.json",
+    "flows/help.json",
+    "flows/fallback.json"
+  ],
+  "functions": [
+    "functions/sendEmail.js",
+    "functions/getEmailStatus.js",
+    "functions/listEmails.js",
+    "functions/verifyDomain.js",
+    "functions/manageContacts.js"
+  ],
+  "environmentVariables": [
+    "RESEND_API_KEY",
+    "VOICEFLOW_API_KEY",
+    "VOICEFLOW_PROJECT_ID"
+  ],
+  "webhookUrl": "https://wh34c025ff0874a90e2f.free.beeceptor.com/"
+}

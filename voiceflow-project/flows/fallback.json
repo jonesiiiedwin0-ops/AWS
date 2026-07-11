@@ -1,0 +1,44 @@
+{
+  "name": "fallback",
+  "description": "Handle unrecognized input",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "fallback_message"
+    },
+    {
+      "id": "fallback_message",
+      "type": "speak",
+      "message": "🤔 I didn't understand that. Here's what I can help with:\n\n• **Send email** - \"Send email to...\"\n• **Check status** - \"Check status of email...\"\n• **List emails** - \"List emails...\"\n• **Verify domain** - \"Verify domain...\"\n• **Manage contacts** - \"Add contact...\"\n• **Help** - \"Help\"\n\nTry saying \"Help\" for more examples!",
+      "next": "offer_help"
+    },
+    {
+      "id": "offer_help",
+      "type": "choice",
+      "prompt": "Would you like help?",
+      "buttons": [
+        { "label": "Show help", "value": "help" },
+        { "label": "Try again", "value": "try_again" }
+      ],
+      "next": "route_fallback"
+    },
+    {
+      "id": "route_fallback",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "help", "next": "help_flow" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "help_flow",
+      "type": "jump",
+      "target": "help"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

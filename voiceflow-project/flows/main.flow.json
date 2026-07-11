@@ -1,0 +1,113 @@
+{
+  "name": "Main Flow",
+  "description": "Entry point for Resend AI Agent",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "welcome"
+    },
+    {
+      "id": "welcome",
+      "type": "speak",
+      "messages": [
+        "👋 Welcome to Resend AI Agent! I can help you send emails, check delivery status, manage domains, and handle contacts. What would you like to do?"
+      ],
+      "next": "listen"
+    },
+    {
+      "id": "listen",
+      "type": "intent",
+      "intents": ["send_email", "check_email_status", "list_emails", "verify_domain", "manage_contacts", "help"],
+      "capture": {
+        "send_email": "send_email_flow",
+        "check_email_status": "check_status_flow",
+        "list_emails": "list_emails_flow",
+        "verify_domain": "verify_domain_flow",
+        "manage_contacts": "manage_contacts_flow",
+        "help": "help_flow"
+      },
+      "fallback": "fallback_flow"
+    },
+    {
+      "id": "send_email_flow",
+      "type": "flow",
+      "flow": "send_email",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "check_status_flow",
+      "type": "flow",
+      "flow": "check_email_status",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "list_emails_flow",
+      "type": "flow",
+      "flow": "list_emails",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "verify_domain_flow",
+      "type": "flow",
+      "flow": "verify_domain",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "manage_contacts_flow",
+      "type": "flow",
+      "flow": "manage_contacts",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "help_flow",
+      "type": "flow",
+      "flow": "help",
+      "next": "continue_prompt"
+    },
+    {
+      "id": "fallback_flow",
+      "type": "flow",
+      "flow": "fallback",
+      "next": "listen"
+    },
+    {
+      "id": "continue_prompt",
+      "type": "choice",
+      "message": "What else can I help you with?",
+      "buttons": [
+        { "label": "Send another email", "value": "send_email" },
+        { "label": "Check email status", "value": "check_email_status" },
+        { "label": "List emails", "value": "list_emails" },
+        { "label": "Verify domain", "value": "verify_domain" },
+        { "label": "Manage contacts", "value": "manage_contacts" },
+        { "label": "Help", "value": "help" },
+        { "label": "Done", "value": "done" }
+      ],
+      "next": "route_continue"
+    },
+    {
+      "id": "route_continue",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "send_email", "next": "send_email_flow" },
+        { "field": "value", "operator": "equals", "value": "check_email_status", "next": "check_status_flow" },
+        { "field": "value", "operator": "equals", "value": "list_emails", "next": "list_emails_flow" },
+        { "field": "value", "operator": "equals", "value": "verify_domain", "next": "verify_domain_flow" },
+        { "field": "value", "operator": "equals", "value": "manage_contacts", "next": "manage_contacts_flow" },
+        { "field": "value", "operator": "equals", "value": "help", "next": "help_flow" }
+      ],
+      "defaultNext": "goodbye"
+    },
+    {
+      "id": "goodbye",
+      "type": "speak",
+      "messages": ["👋 Thanks for using Resend AI Agent! Have a great day!"],
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

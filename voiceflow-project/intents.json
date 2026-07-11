@@ -1,0 +1,70 @@
+{
+  "intents": [
+    {
+      "name": "send_email",
+      "description": "Send transactional or marketing email via Resend",
+      "entities": ["to_email", "from_email", "email_subject", "html_content", "text_content", "reply_to", "email_tags"],
+      "examples": [
+        "Send an email to john@example.com with subject Welcome and html content <h1>Hello!</h1>",
+        "Email jane@company.com from noreply@mydomain.com subject Newsletter html <p>News</p>",
+        "Send email to user@test.com subject Test text Hello World"
+      ]
+    },
+    {
+      "name": "check_email_status",
+      "description": "Check delivery status of a sent email",
+      "entities": ["email_id"],
+      "examples": [
+        "Check status of email abc123-def456",
+        "What's the delivery status for email id xyz-789",
+        "Is email 12345678-1234-1234-1234-123456789012 delivered?"
+      ]
+    },
+    {
+      "name": "list_emails",
+      "description": "List sent emails with optional filters",
+      "entities": ["limit", "from_date", "to_date", "status"],
+      "examples": [
+        "List last 10 emails",
+        "Show emails from 2024-01-01 to 2024-01-31",
+        "List bounced emails with limit 20"
+      ]
+    },
+    {
+      "name": "verify_domain",
+      "description": "Verify a sending domain in Resend",
+      "entities": ["domain_name"],
+      "examples": [
+        "Verify domain example.com",
+        "Add sending domain mycompany.com",
+        "Check domain verification for test.org"
+      ]
+    },
+    {
+      "name": "manage_contacts",
+      "description": "Manage contacts in Resend audiences",
+      "entities": ["action", "contact_email", "contact_audience_id", "contact_first_name", "contact_last_name", "contact_unsubscribed"],
+      "examples": [
+        "Add contact john@example.com to audience abc-123",
+        "Update contact jane@example.com in audience xyz-789 first name Jane",
+        "Unsubscribe user@test.com from audience def-456"
+      ]
+    },
+    {
+      "name": "help",
+      "description": "Show available commands and examples",
+      "entities": [],
+      "examples": [
+        "Help",
+        "What can you do?",
+        "Show commands"
+      ]
+    },
+    {
+      "name": "fallback",
+      "description": "Handle unrecognized input",
+      "entities": [],
+      "examples": []
+    }
+  ]
+}

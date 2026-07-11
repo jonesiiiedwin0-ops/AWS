@@ -1,0 +1,103 @@
+{
+  "name": "manage_contacts",
+  "description": "Manage contacts in Resend audiences",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_action"
+    },
+    {
+      "id": "capture_action",
+      "type": "choice",
+      "prompt": "What would you like to do?",
+      "buttons": [
+        { "label": "Add contact", "value": "add" },
+        { "label": "Update contact", "value": "update" },
+        { "label": "Unsubscribe contact", "value": "unsubscribe" }
+      ],
+      "entity": "action",
+      "next": "capture_audience"
+    },
+    {
+      "id": "capture_audience",
+      "type": "capture",
+      "entity": "contact_audience_id",
+      "prompt": "Audience ID (UUID):",
+      "validation": { "type": "regex", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+      "next": "capture_email"
+    },
+    {
+      "id": "capture_email",
+      "type": "capture",
+      "entity": "contact_email",
+      "prompt": "Contact email:",
+      "validation": { "type": "regex", "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$" },
+      "next": "capture_details"
+    },
+    {
+      "id": "capture_details",
+      "type": "condition",
+      "conditions": [
+        { "field": "action", "operator": "equals", "value": "add", "next": "capture_names" },
+        { "field": "action", "operator": "equals", "value": "update", "next": "capture_names" }
+      ],
+      "defaultNext": "manage_contacts_function"
+    },
+    {
+      "id": "capture_names",
+      "type": "capture",
+      "entity": "contact_first_name",
+      "prompt": "First name (optional):",
+      "required": false,
+      "next": "capture_last_name"
+    },
+    {
+      "id": "capture_last_name",
+      "type": "capture",
+      "entity": "contact_last_name",
+      "prompt": "Last name (optional):",
+      "required": false,
+      "next": "manage_contacts_function"
+    },
+    {
+      "id": "manage_contacts_function",
+      "type": "function",
+      "function": "manageContacts",
+      "params": {
+        "action": "{{action}}",
+        "email": "{{contact_email}}",
+        "audience_id": "{{contact_audience_id}}",
+        "first_name": "{{contact_first_name}}",
+        "last_name": "{{contact_last_name}}",
+        "unsubscribed": "{{equals action 'unsubscribe'}}"
+      },
+      "next": "handle_contact_result"
+    },
+    {
+      "id": "handle_contact_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "contact_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "contact_error" }
+      ],
+      "defaultNext": "contact_error"
+    },
+    {
+      "id": "contact_success",
+      "type": "speak",
+      "message": "✅ {{message}}\n\n**Contact:** {{contact.email}}\n**Audience:** {{contact.audience_id}}\n{{#if contact.first_name}}**Name:** {{contact.first_name}} {{contact.last_name}}{{/if}}\n**Unsubscribed:** {{contact.unsubscribed}}",
+      "next": "end"
+    },
+    {
+      "id": "contact_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

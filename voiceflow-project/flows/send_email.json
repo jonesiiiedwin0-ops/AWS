@@ -1,0 +1,140 @@
+{
+  "name": "send_email",
+  "description": "Send transactional or marketing email via Resend",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_to"
+    },
+    {
+      "id": "capture_to",
+      "type": "capture",
+      "entity": "to_email",
+      "prompt": "Recipient email address:",
+      "next": "capture_from"
+    },
+    {
+      "id": "capture_from",
+      "type": "capture",
+      "entity": "from_email",
+      "prompt": "From email (verified domain, e.g., onboarding@yourdomain.com):",
+      "required": false,
+      "default": "onboarding@resend.dev",
+      "next": "capture_subject"
+    },
+    {
+      "id": "capture_subject",
+      "type": "capture",
+      "entity": "email_subject",
+      "prompt": "Email subject:",
+      "next": "capture_content_type"
+    },
+    {
+      "id": "capture_content_type",
+      "type": "choice",
+      "prompt": "Content type:",
+      "buttons": [
+        { "label": "HTML", "value": "html" },
+        { "label": "Plain text", "value": "text" },
+        { "label": "Both", "value": "both" }
+      ],
+      "entity": "content_type",
+      "next": "capture_content"
+    },
+    {
+      "id": "capture_content",
+      "type": "capture",
+      "entity": "html_content",
+      "prompt": "Enter {{content_type}} content:",
+      "next": "capture_optional"
+    },
+    {
+      "id": "capture_optional",
+      "type": "choice",
+      "prompt": "Add optional fields?",
+      "buttons": [
+        { "label": "No, send now", "value": "none" },
+        { "label": "Reply-to", "value": "reply_to" },
+        { "label": "Tags", "value": "tags" },
+        { "label": "Schedule", "value": "schedule" }
+      ],
+      "next": "process_optional"
+    },
+    {
+      "id": "process_optional",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "reply_to", "next": "capture_reply_to" },
+        { "field": "value", "operator": "equals", "value": "tags", "next": "capture_tags" },
+        { "field": "value", "operator": "equals", "value": "schedule", "next": "capture_schedule" }
+      ],
+      "defaultNext": "send_email_function"
+    },
+    {
+      "id": "capture_reply_to",
+      "type": "capture",
+      "entity": "reply_to",
+      "prompt": "Reply-to email:",
+      "required": false,
+      "next": "capture_optional"
+    },
+    {
+      "id": "capture_tags",
+      "type": "capture",
+      "entity": "email_tags",
+      "prompt": "Tags (comma-separated, e.g., campaign:welcome,source:api):",
+      "required": false,
+      "next": "capture_optional"
+    },
+    {
+      "id": "capture_schedule",
+      "type": "capture",
+      "entity": "scheduled_at",
+      "prompt": "Schedule for (ISO 8601, e.g., 2024-12-31T23:59:59Z):",
+      "required": false,
+      "next": "capture_optional"
+    },
+    {
+      "id": "send_email_function",
+      "type": "function",
+      "function": "sendEmail",
+      "params": {
+        "to": "{{to_email}}",
+        "from": "{{from_email}}",
+        "subject": "{{email_subject}}",
+        "html": "{{#eq content_type 'html'}}{{html_content}}{{/eq}}{{#eq content_type 'both'}}{{html_content}}{{/eq}}",
+        "text": "{{#eq content_type 'text'}}{{html_content}}{{/eq}}{{#eq content_type 'both'}}{{text_content}}{{/eq}}",
+        "reply_to": "{{reply_to}}",
+        "tags": "{{#if email_tags}}{{#split email_tags ','}}{{name: this.trim()}}{{/split}}{{/if}}",
+        "scheduled_at": "{{scheduled_at}}"
+      },
+      "next": "handle_send_result"
+    },
+    {
+      "id": "handle_send_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "send_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "send_error" }
+      ],
+      "defaultNext": "send_error"
+    },
+    {
+      "id": "send_success",
+      "type": "speak",
+      "message": "✅ Email sent successfully!\n\n**Email ID:** {{email_id}}\n**Message:** {{message}}",
+      "next": "end"
+    },
+    {
+      "id": "send_error",
+      "type": "speak",
+      "message": "❌ Failed to send email: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

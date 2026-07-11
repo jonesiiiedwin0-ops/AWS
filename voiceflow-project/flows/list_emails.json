@@ -1,0 +1,128 @@
+{
+  "name": "list_emails",
+  "description": "List sent emails with optional filters",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_filters"
+    },
+    {
+      "id": "capture_filters",
+      "type": "choice",
+      "prompt": "Filter emails?",
+      "buttons": [
+        { "label": "No, list all", "value": "none" },
+        { "label": "By date range", "value": "date" },
+        { "label": "By status", "value": "status" },
+        { "label": "By limit", "value": "limit" }
+      ],
+      "next": "process_filters"
+    },
+    {
+      "id": "process_filters",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "date", "next": "capture_date_from" },
+        { "field": "value", "operator": "equals", "value": "status", "next": "capture_status" },
+        { "field": "value", "operator": "equals", "value": "limit", "next": "capture_limit" }
+      ],
+      "defaultNext": "list_emails_function"
+    },
+    {
+      "id": "capture_date_from",
+      "type": "capture",
+      "entity": "from_date",
+      "prompt": "From date (ISO 8601, e.g., 2024-01-01T00:00:00Z):",
+      "next": "capture_date_to"
+    },
+    {
+      "id": "capture_date_to",
+      "type": "capture",
+      "entity": "to_date",
+      "prompt": "To date (ISO 8601, e.g., 2024-01-31T23:59:59Z):",
+      "next": "capture_filters"
+    },
+    {
+      "id": "capture_status",
+      "type": "choice",
+      "prompt": "Status filter:",
+      "buttons": [
+        { "label": "Delivered", "value": "delivered" },
+        { "label": "Bounced", "value": "bounced" },
+        { "label": "Complained", "value": "complained" },
+        { "label": "Sent", "value": "sent" }
+      ],
+      "entity": "status",
+      "next": "capture_filters"
+    },
+    {
+      "id": "capture_limit",
+      "type": "capture",
+      "entity": "limit",
+      "prompt": "Max emails to return (1-100):",
+      "validation": { "type": "number", "min": 1, "max": 100 },
+      "next": "capture_filters"
+    },
+    {
+      "id": "list_emails_function",
+      "type": "function",
+      "function": "listEmails",
+      "params": {
+        "limit": "{{limit || 10}}",
+        "created_after": "{{from_date}}",
+        "created_before": "{{to_date}}",
+        "status": "{{status}}"
+      },
+      "next": "handle_list_result"
+    },
+    {
+      "id": "handle_list_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "list_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "list_error" }
+      ],
+      "defaultNext": "list_error"
+    },
+    {
+      "id": "list_success",
+      "type": "speak",
+      "message": "{{#if emails.length}}\n📧 **Emails ({{emails.length}} of {{total_count}}):**\n\n{{#each emails}}\n**{{@index + 1}}.** {{subject}}\n   ID: {{id}} | Status: {{last_event}} | To: {{to}} | {{created_at}}\n{{/each}}\n{{#if has_more}}\n... and {{total_count - emails.length}} more\n{{/if}}\n{{else}}\n📭 No emails found matching your criteria.\n{{/if}}",
+      "next": "offer_more"
+    },
+    {
+      "id": "list_error",
+      "type": "speak",
+      "message": "❌ Error listing emails: {{error}}",
+      "next": "offer_more"
+    },
+    {
+      "id": "offer_more",
+      "type": "choice",
+      "prompt": "Check status of a specific email?",
+      "buttons": [
+        { "label": "Yes, check status", "value": "check_status" },
+        { "label": "No, done", "value": "done" }
+      ],
+      "next": "route_offer"
+    },
+    {
+      "id": "route_offer",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "check_status", "next": "check_status_flow" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "check_status_flow",
+      "type": "jump",
+      "target": "check_email_status"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

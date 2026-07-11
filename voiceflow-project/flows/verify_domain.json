@@ -1,0 +1,69 @@
+{
+  "name": "verify_domain",
+  "description": "Verify a sending domain in Resend",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_domain"
+    },
+    {
+      "id": "capture_domain",
+      "type": "capture",
+      "entity": "domain_name",
+      "prompt": "Enter domain to verify (e.g., example.com):",
+      "validation": { "type": "regex", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\\.[a-zA-Z]{2,}$" },
+      "next": "confirm_domain"
+    },
+    {
+      "id": "confirm_domain",
+      "type": "choice",
+      "prompt": "Verify domain \"{{domain_name}}\"?",
+      "buttons": [
+        { "label": "Yes, verify", "value": "yes" },
+        { "label": "No, cancel", "value": "no" }
+      ],
+      "next": "verify_domain_function"
+    },
+    {
+      "id": "verify_domain_function",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "yes", "next": "execute_verify" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "execute_verify",
+      "type": "function",
+      "function": "verifyDomain",
+      "params": { "domain": "{{domain_name}}" },
+      "next": "handle_verify_result"
+    },
+    {
+      "id": "handle_verify_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "verify_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "verify_error" }
+      ],
+      "defaultNext": "verify_error"
+    },
+    {
+      "id": "verify_success",
+      "type": "speak",
+      "message": "✅ Domain verification initiated!\n\n**Domain:** {{domain}}\n**ID:** {{id}}\n**Status:** {{status}}\n**Region:** {{region}}\n\n{{instructions}}\n\n{{#each dns_records}}\n**{{type}}** | {{name}} | {{value}}\n{{#if priority}}Priority: {{priority}}{{/if}}\n{{/each}}\n\nAdd these DNS records in your domain provider (Cloudflare, GoDaddy, Route53, etc.). Verification may take up to 48 hours.",
+      "next": "end"
+    },
+    {
+      "id": "verify_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

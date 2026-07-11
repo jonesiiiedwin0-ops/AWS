@@ -1,0 +1,116 @@
+{
+  "entities": [
+    {
+      "name": "to_email",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Recipient email address"
+    },
+    {
+      "name": "from_email",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Sender email address (must be from verified domain)"
+    },
+    {
+      "name": "email_subject",
+      "type": "custom",
+      "values": [],
+      "description": "Email subject line (max 998 chars)"
+    },
+    {
+      "name": "html_content",
+      "type": "custom",
+      "values": [],
+      "description": "HTML email body content"
+    },
+    {
+      "name": "text_content",
+      "type": "custom",
+      "values": [],
+      "description": "Plain text email body content"
+    },
+    {
+      "name": "reply_to",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Reply-to email address"
+    },
+    {
+      "name": "email_tags",
+      "type": "custom",
+      "values": [],
+      "description": "Comma-separated tags for tracking"
+    },
+    {
+      "name": "email_id",
+      "type": "regex",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Resend email ID (UUID)"
+    },
+    {
+      "name": "limit",
+      "type": "number",
+      "min": 1,
+      "max": 100,
+      "description": "Max emails to return (1-100)"
+    },
+    {
+      "name": "from_date",
+      "type": "datetime",
+      "description": "Start date for filtering"
+    },
+    {
+      "name": "to_date",
+      "type": "datetime",
+      "description": "End date for filtering"
+    },
+    {
+      "name": "status",
+      "type": "custom",
+      "values": ["delivered", "bounced", "complained", "sent"],
+      "description": "Delivery status filter"
+    },
+    {
+      "name": "domain_name",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\\.[a-zA-Z]{2,}$",
+      "description": "Domain name for verification"
+    },
+    {
+      "name": "action",
+      "type": "custom",
+      "values": ["add", "update", "unsubscribe"],
+      "description": "Contact management action"
+    },
+    {
+      "name": "contact_email",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Contact email address"
+    },
+    {
+      "name": "contact_audience_id",
+      "type": "regex",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Resend audience ID (UUID)"
+    },
+    {
+      "name": "contact_first_name",
+      "type": "custom",
+      "values": [],
+      "description": "Contact first name"
+    },
+    {
+      "name": "contact_last_name",
+      "type": "custom",
+      "values": [],
+      "description": "Contact last name"
+    },
+    {
+      "name": "contact_unsubscribed",
+      "type": "boolean",
+      "description": "Whether contact is unsubscribed"
+    }
+  ]
+}

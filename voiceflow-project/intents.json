@@ -73,6 +73,28 @@
       ]
     },
     {
+      "name": "manage_audiences",
+      "description": "Manage Resend audiences (create, list, get, update, delete)",
+      "entities": ["audience_action", "audience_name", "audience_description", "audience_id", "audience_update_field", "audience_update_value"],
+      "examples": [
+        "Create audience newsletter subscribers",
+        "List audiences",
+        "Show audience 12345678-1234-1234-1234-123456789012",
+        "Update audience abc-def name new name",
+        "Delete audience xyz-123"
+      ]
+    },
+    {
+      "name": "send_batch",
+      "description": "Send multiple emails in batch",
+      "entities": ["batch_name", "email_count", "batch_email_to", "batch_email_from", "batch_email_subject", "batch_email_html", "batch_email_text", "batch_email_reply_to", "batch_email_tags"],
+      "examples": [
+        "Send batch of 10 emails",
+        "Batch send newsletter to subscribers",
+        "Send multiple emails at once"
+      ]
+    },
+    {
       "name": "help",
       "description": "Show available commands and examples",
       "entities": [],

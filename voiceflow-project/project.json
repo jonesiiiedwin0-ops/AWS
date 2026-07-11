@@ -1,7 +1,7 @@
 {
   "name": "Resend AI Agent",
-  "description": "Voiceflow agent for managing Resend emails, domains, contacts, templates, and webhooks",
-  "version": "1.2.0",
+  "description": "Voiceflow agent for managing Resend emails, domains, contacts, templates, audiences, batches, and webhooks",
+  "version": "1.3.0",
   "language": "en-US",
   "timezone": "UTC",
   "intents": "intents.json",
@@ -14,6 +14,8 @@
     "flows/verify_domain.json",
     "flows/manage_contacts.json",
     "flows/manage_templates.json",
+    "flows/manage_audiences.json",
+    "flows/send_batch.json",
     "flows/webhook_events.json",
     "flows/help.json",
     "flows/fallback.json"
@@ -25,7 +27,10 @@
     "functions/verifyDomain.js",
     "functions/manageContacts.js",
     "functions/manageTemplates.js",
-    "functions/handleWebhook.js"
+    "functions/manageAudiences.js",
+    "functions/sendBatch.js",
+    "functions/handleWebhook.js",
+    "functions/addToEmailArray.js"
   ],
   "environmentVariables": [
     "RESEND_API_KEY",

@@ -1,0 +1,265 @@
+{
+  "name": "manage_audiences",
+  "description": "Manage Resend audiences (create, list, get, update, delete)",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_action"
+    },
+    {
+      "id": "capture_action",
+      "type": "choice",
+      "prompt": "What would you like to do with audiences?",
+      "buttons": [
+        { "label": "Create audience", "value": "create" },
+        { "label": "List audiences", "value": "list" },
+        { "label": "View audience", "value": "get" },
+        { "label": "Update audience", "value": "update" },
+        { "label": "Delete audience", "value": "delete" }
+      ],
+      "entity": "audience_action",
+      "next": "route_action"
+    },
+    {
+      "id": "route_action",
+      "type": "condition",
+      "conditions": [
+        { "field": "audience_action", "operator": "equals", "value": "create", "next": "create_name" },
+        { "field": "audience_action", "operator": "equals", "value": "list", "next": "list_audiences_function" },
+        { "field": "audience_action", "operator": "equals", "value": "get", "next": "get_audience_id" },
+        { "field": "audience_action", "operator": "equals", "value": "update", "next": "update_audience_id" },
+        { "field": "audience_action", "operator": "equals", "value": "delete", "next": "delete_audience_id" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "create_name",
+      "type": "capture",
+      "entity": "audience_name",
+      "prompt": "Audience name:",
+      "next": "create_description"
+    },
+    {
+      "id": "create_description",
+      "type": "capture",
+      "entity": "audience_description",
+      "prompt": "Description (optional):",
+      "required": false,
+      "next": "create_audience_function"
+    },
+    {
+      "id": "create_audience_function",
+      "type": "function",
+      "function": "manageAudiences",
+      "params": {
+        "action": "create",
+        "name": "{{audience_name}}",
+        "description": "{{audience_description}}"
+      },
+      "next": "handle_create_result"
+    },
+    {
+      "id": "handle_create_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "create_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "create_error" }
+      ],
+      "defaultNext": "create_error"
+    },
+    {
+      "id": "create_success",
+      "type": "speak",
+      "message": "✅ Audience created!\n\n**ID:** {{data.id}}\n**Name:** {{data.name}}\n**Description:** {{data.description || 'none'}}",
+      "next": "end"
+    },
+    {
+      "id": "create_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "list_audiences_function",
+      "type": "function",
+      "function": "manageAudiences",
+      "params": { "action": "list" },
+      "next": "handle_list_result"
+    },
+    {
+      "id": "handle_list_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "list_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "list_error" }
+      ],
+      "defaultNext": "list_error"
+    },
+    {
+      "id": "list_success",
+      "type": "speak",
+      "message": "{{#if data.length}}\n📋 **Audiences ({{data.length}}):**\n\n{{#each data}}\n**{{@index + 1}}.** {{name}} ({{id}})\n   Description: {{description || 'none'}}\n   Created: {{created_at}}\n---\n{{/each}}\n{{else}}\n📭 No audiences found.\n{{/if}}",
+      "next": "end"
+    },
+    {
+      "id": "list_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "get_audience_id",
+      "type": "capture",
+      "entity": "audience_id",
+      "prompt": "Audience ID (UUID):",
+      "validation": { "type": "regex", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+      "next": "get_audience_function"
+    },
+    {
+      "id": "get_audience_function",
+      "type": "function",
+      "function": "manageAudiences",
+      "params": { "action": "get", "audienceId": "{{audience_id}}" },
+      "next": "handle_get_result"
+    },
+    {
+      "id": "handle_get_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "get_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "get_error" }
+      ],
+      "defaultNext": "get_error"
+    },
+    {
+      "id": "get_success",
+      "type": "speak",
+      "message": "📋 **Audience Details:**\n\n**ID:** {{data.id}}\n**Name:** {{data.name}}\n**Description:** {{data.description || 'none'}}\n**Created:** {{data.created_at}}",
+      "next": "end"
+    },
+    {
+      "id": "get_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "update_audience_id",
+      "type": "capture",
+      "entity": "audience_id",
+      "prompt": "Audience ID to update:",
+      "validation": { "type": "regex", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+      "next": "update_field"
+    },
+    {
+      "id": "update_field",
+      "type": "choice",
+      "prompt": "What to update?",
+      "buttons": [
+        { "label": "Name", "value": "name" },
+        { "label": "Description", "value": "description" }
+      ],
+      "entity": "update_field",
+      "next": "update_value"
+    },
+    {
+      "id": "update_value",
+      "type": "capture",
+      "entity": "update_value",
+      "prompt": "New {{update_field}}:",
+      "next": "update_audience_function"
+    },
+    {
+      "id": "update_audience_function",
+      "type": "function",
+      "function": "manageAudiences",
+      "params": {
+        "action": "update",
+        "audienceId": "{{audience_id}}",
+        "name": "{{#eq update_field 'name'}}{{update_value}}{{/eq}}",
+        "description": "{{#eq update_field 'description'}}{{update_value}}{{/eq}}"
+      },
+      "next": "handle_update_result"
+    },
+    {
+      "id": "handle_update_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "update_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "update_error" }
+      ],
+      "defaultNext": "update_error"
+    },
+    {
+      "id": "update_success",
+      "type": "speak",
+      "message": "✅ Audience updated!\n\n**ID:** {{data.id}}\n**Name:** {{data.name}}\n**Description:** {{data.description || 'none'}}",
+      "next": "end"
+    },
+    {
+      "id": "update_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "delete_audience_id",
+      "type": "capture",
+      "entity": "audience_id",
+      "prompt": "Audience ID to delete:",
+      "validation": { "type": "regex", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+      "next": "confirm_delete"
+    },
+    {
+      "id": "confirm_delete",
+      "type": "choice",
+      "prompt": "⚠️ Delete audience {{audience_id}} permanently?",
+      "buttons": [
+        { "label": "Yes, delete", "value": "yes" },
+        { "label": "Cancel", "value": "no" }
+      ],
+      "next": "process_delete"
+    },
+    {
+      "id": "process_delete",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "yes", "next": "delete_audience_function" }
+      ],
+      "defaultNext": "end"
+    },
+    {
+      "id": "delete_audience_function",
+      "type": "function",
+      "function": "manageAudiences",
+      "params": { "action": "delete", "audienceId": "{{audience_id}}" },
+      "next": "handle_delete_result"
+    },
+    {
+      "id": "handle_delete_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "delete_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "delete_error" }
+      ],
+      "defaultNext": "delete_error"
+    },
+    {
+      "id": "delete_success",
+      "type": "speak",
+      "message": "✅ Audience deleted successfully.",
+      "next": "end"
+    },
+    {
+      "id": "delete_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

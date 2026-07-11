@@ -230,6 +230,97 @@
       "type": "custom",
       "values": [],
       "description": "User ID for notification"
+    },
+    {
+      "name": "audience_action",
+      "type": "custom",
+      "values": ["create", "list", "get", "update", "delete"],
+      "description": "Audience management action"
+    },
+    {
+      "name": "audience_name",
+      "type": "custom",
+      "values": [],
+      "description": "Audience name"
+    },
+    {
+      "name": "audience_description",
+      "type": "custom",
+      "values": [],
+      "description": "Audience description"
+    },
+    {
+      "name": "audience_id",
+      "type": "regex",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Audience ID (UUID)"
+    },
+    {
+      "name": "audience_update_field",
+      "type": "custom",
+      "values": ["name", "description"],
+      "description": "Audience field to update"
+    },
+    {
+      "name": "audience_update_value",
+      "type": "custom",
+      "values": [],
+      "description": "New value for audience update"
+    },
+    {
+      "name": "batch_name",
+      "type": "custom",
+      "values": [],
+      "description": "Batch name"
+    },
+    {
+      "name": "email_count",
+      "type": "number",
+      "min": 1,
+      "max": 1000,
+      "description": "Number of emails in batch"
+    },
+    {
+      "name": "batch_email_to",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Batch email recipient"
+    },
+    {
+      "name": "batch_email_from",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Batch email sender"
+    },
+    {
+      "name": "batch_email_subject",
+      "type": "custom",
+      "values": [],
+      "description": "Batch email subject"
+    },
+    {
+      "name": "batch_email_html",
+      "type": "custom",
+      "values": [],
+      "description": "Batch email HTML content"
+    },
+    {
+      "name": "batch_email_text",
+      "type": "custom",
+      "values": [],
+      "description": "Batch email text content"
+    },
+    {
+      "name": "batch_email_reply_to",
+      "type": "regex",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "description": "Batch email reply-to"
+    },
+    {
+      "name": "batch_email_tags",
+      "type": "custom",
+      "values": [],
+      "description": "Batch email tags"
     }
   ]
 }

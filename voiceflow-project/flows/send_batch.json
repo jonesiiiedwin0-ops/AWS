@@ -1,0 +1,182 @@
+{
+  "name": "send_batch",
+  "description": "Send multiple emails in batch",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "next": "capture_batch_name"
+    },
+    {
+      "id": "capture_batch_name",
+      "type": "capture",
+      "entity": "batch_name",
+      "prompt": "Enter a name for this batch (optional):",
+      "required": false,
+      "next": "capture_email_count"
+    },
+    {
+      "id": "capture_email_count",
+      "type": "capture",
+      "entity": "email_count",
+      "prompt": "How many emails in this batch? (1-1000):",
+      "validation": { "type": "number", "min": 1, "max": 1000 },
+      "next": "collect_emails"
+    },
+    {
+      "id": "collect_emails",
+      "type": "set",
+      "set": [
+        { "variable": "email_index", "value": 0 },
+        { "variable": "emails_json", "value": "[]" }
+      ],
+      "next": "collect_email_loop"
+    },
+    {
+      "id": "collect_email_loop",
+      "type": "condition",
+      "conditions": [
+        { "field": "email_index", "operator": "less_than", "value": "{{email_count}}", "next": "collect_email_to" }
+      ],
+      "defaultNext": "send_batch_function"
+    },
+    {
+      "id": "collect_email_to",
+      "type": "capture",
+      "entity": "batch_email_to",
+      "prompt": "Email {{add email_index 1}} - Recipient:",
+      "next": "collect_email_from"
+    },
+    {
+      "id": "collect_email_from",
+      "type": "capture",
+      "entity": "batch_email_from",
+      "prompt": "Email {{add email_index 1}} - From (verified domain):",
+      "next": "collect_email_subject"
+    },
+    {
+      "id": "collect_email_subject",
+      "type": "capture",
+      "entity": "batch_email_subject",
+      "prompt": "Email {{add email_index 1}} - Subject:",
+      "next": "collect_email_html"
+    },
+    {
+      "id": "collect_email_html",
+      "type": "capture",
+      "entity": "batch_email_html",
+      "prompt": "Email {{add email_index 1}} - HTML content:",
+      "next": "collect_email_text"
+    },
+    {
+      "id": "collect_email_text",
+      "type": "capture",
+      "entity": "batch_email_text",
+      "prompt": "Email {{add email_index 1}} - Text content (optional):",
+      "required": false,
+      "next": "collect_email_optional"
+    },
+    {
+      "id": "collect_email_optional",
+      "type": "choice",
+      "prompt": "Add optional fields for email {{add email_index 1}}?",
+      "buttons": [
+        { "label": "No, next email", "value": "next" },
+        { "label": "Reply-to", "value": "reply_to" },
+        { "label": "Tags", "value": "tags" }
+      ],
+      "next": "process_email_optional"
+    },
+    {
+      "id": "process_email_optional",
+      "type": "condition",
+      "conditions": [
+        { "field": "value", "operator": "equals", "value": "reply_to", "next": "collect_email_reply_to" },
+        { "field": "value", "operator": "equals", "value": "tags", "next": "collect_email_tags" }
+      ],
+      "defaultNext": "add_email_to_array"
+    },
+    {
+      "id": "collect_email_reply_to",
+      "type": "capture",
+      "entity": "batch_email_reply_to",
+      "prompt": "Reply-to email:",
+      "required": false,
+      "next": "collect_email_optional"
+    },
+    {
+      "id": "collect_email_tags",
+      "type": "capture",
+      "entity": "batch_email_tags",
+      "prompt": "Tags (comma-separated):",
+      "required": false,
+      "next": "collect_email_optional"
+    },
+    {
+      "id": "add_email_to_array",
+      "type": "function",
+      "function": "addToEmailArray",
+      "params": {
+        "emailsJson": "{{emails_json}}",
+        "to": "{{batch_email_to}}",
+        "from": "{{batch_email_from}}",
+        "subject": "{{batch_email_subject}}",
+        "html": "{{batch_email_html}}",
+        "text": "{{batch_email_text}}",
+        "replyTo": "{{batch_email_reply_to}}",
+        "tags": "{{batch_email_tags}}"
+      },
+      "next": "increment_index"
+    },
+    {
+      "id": "increment_index",
+      "type": "set",
+      "set": [
+        { "variable": "email_index", "value": "{{add email_index 1}}" }
+      ],
+      "next": "collect_email_loop"
+    },
+    {
+      "id": "send_batch_function",
+      "type": "function",
+      "function": "sendBatch",
+      "params": {
+        "emails": "{{#json emails_json}}{{/json}}",
+        "batchName": "{{batch_name}}",
+        "webhookUrl": "https://wh34c025ff0874a90e2f.free.beeceptor.com/"
+      },
+      "next": "handle_batch_result"
+    },
+    {
+      "id": "handle_batch_result",
+      "type": "condition",
+      "conditions": [
+        { "field": "success", "operator": "equals", "value": true, "next": "batch_success" },
+        { "field": "success", "operator": "equals", "value": false, "next": "batch_partial" }
+      ],
+      "defaultNext": "batch_error"
+    },
+    {
+      "id": "batch_success",
+      "type": "speak",
+      "message": "✅ Batch sent successfully!\n\n{{message}}\n\n{{#each results.success}}\n**Email {{@index + 1}}:** {{this.to}} - {{this.emailId}}\n{{/each}}",
+      "next": "end"
+    },
+    {
+      "id": "batch_partial",
+      "type": "speak",
+      "message": "⚠️ Batch completed with some failures:\n\n{{message}}\n\n{{#each results.success}}\n✅ {{this.to}} - {{this.emailId}}\n{{/each}}\n\n{{#each results.failed}}\n❌ {{this.email}} - {{this.error}}\n{{/each}}",
+      "next": "end"
+    },
+    {
+      "id": "batch_error",
+      "type": "speak",
+      "message": "❌ Error: {{error}}",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

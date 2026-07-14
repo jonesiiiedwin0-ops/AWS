@@ -36,6 +36,7 @@ setup(
     entry_points={
         "console_scripts": [
             "aws-mcp-server=aws_mcp_server.__main__:main",
+            "env-agent=env_agent.__main__:main",
         ],
     },
     include_package_data=True,

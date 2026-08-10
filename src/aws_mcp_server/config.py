@@ -62,6 +62,10 @@ class Config(BaseSettings):
     enable_rate_limiting: bool = Field(default=True, description="Enable rate limiting")
     enable_caching: bool = Field(default=True, description="Enable response caching")
     cache_ttl: int = Field(default=300, description="Cache TTL in seconds")
+    webhook_url: Optional[str] = Field(
+        default=None,
+        description="Webhook URL for external event notifications",
+    )
 
     @field_validator("enabled_services", mode="before")
     @classmethod

@@ -19,6 +19,8 @@ from .models import (
 from .rate_limiter import RateLimitExceeded
 from .services import ServiceRegistry
 from .services.base import ServiceError
+from .services.webhook import WebhookNotifier
+from .llm_client import LLMClientManager
 from .middleware import ErrorHandlerMiddleware, LoggingMiddleware
 
 logger = logging.getLogger(__name__)
@@ -57,6 +59,26 @@ class MCPServer:
         """
         self.config = config or Config()
         self.metrics = metrics or default_collector
+        
+        # Initialize webhook notifier if a webhook URL is configured
+        self.webhook_notifier = None
+        if self.config.webhook_url:
+            self.webhook_notifier = WebhookNotifier(self.config.webhook_url)
+            
+        # Initialize LLM client manager for agentic operations
+        self.llm_client_manager = LLMClientManager()
+        # Example LLM client registration (can be extended)
+        try:
+            self.llm_client_manager.register_client(
+                "openai",
+                LLMClient(
+                    api_key=self.config.ai_api_key or "",
+                    model=self.config.ai_model or "gpt-3.5-turbo",
+                )
+            )
+        except Exception as e:
+            logger.warning("LLM client initialization failed: %s", e)
+        
         self.app = FastAPI(
             title="AWS MCP Server",
             description=API_DESCRIPTION,
